@@ -16,3 +16,9 @@ pip install -r requirements.txt
 ## Run
 
 streamlit run app.py
+## Demo Features
+
+- Generate SEO Keywords
+- Generate Meta Description
+- AI Article Creation
+- HackerNoon Content Format
