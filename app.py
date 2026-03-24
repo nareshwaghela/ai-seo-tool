@@ -1,5 +1,4 @@
 import streamlit as st
-from seo_tools import generate_keywords, generate_meta_description
 
 st.title("AI SEO Automation Tool")
 
@@ -7,8 +6,15 @@ topic = st.text_input("Enter Topic")
 
 if st.button("Generate SEO Data"):
 
-    keywords = generate_keywords(topic)
-    meta = generate_meta_description(topic)
+    keywords = [
+        f"{topic} tutorial",
+        f"{topic} guide",
+        f"best {topic} tools",
+        f"{topic} examples",
+        f"{topic} tips"
+    ]
+
+    meta = f"Learn about {topic} with this complete guide including tips, tools, and examples."
 
     st.subheader("SEO Keywords")
     st.write(keywords)
