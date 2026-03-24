@@ -1,22 +1,17 @@
 import streamlit as st
-import openai
+from seo_tools import generate_keywords, generate_meta_description
 
-openai.api_key = "YOUR_OPENAI_API_KEY"
+st.title("AI SEO Automation Tool")
 
-def generate_article(keyword):
-    prompt = f"Write a SEO optimized article about {keyword} with headings and FAQs."
+topic = st.text_input("Enter Topic")
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}]
-    )
+if st.button("Generate SEO Data"):
 
-    return response["choices"][0]["message"]["content"]
+    keywords = generate_keywords(topic)
+    meta = generate_meta_description(topic)
 
-st.title("AI SEO Article Generator")
+    st.subheader("SEO Keywords")
+    st.write(keywords)
 
-keyword = st.text_input("Enter Keyword")
-
-if st.button("Generate Article"):
-    article = generate_article(keyword)
-    st.write(article)
+    st.subheader("Meta Description")
+    st.write(meta)
