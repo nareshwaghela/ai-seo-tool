@@ -1,8 +1,4 @@
 import streamlit as st
-from openai import OpenAI
-
-# Load API key from secrets
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("AI SEO Automation Tool")
 
@@ -12,17 +8,31 @@ if st.button("Generate SEO Content"):
 
     if topic == "":
         st.warning("Please enter a topic")
-
     else:
 
-        keyword_prompt = f"Generate 10 SEO keywords for {topic}"
+        keywords = [
+            f"best {topic}",
+            f"{topic} tools",
+            f"{topic} guide",
+            f"{topic} tutorial",
+            f"{topic} examples",
+        ]
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": keyword_prompt}]
-        )
+        meta = f"Learn everything about {topic}. Complete guide, tools, and tips."
 
-        keywords = response.choices[0].message.content
+        outline = [
+            f"What is {topic}",
+            f"Benefits of {topic}",
+            f"Best {topic} tools",
+            f"How to use {topic}",
+            f"Future of {topic}"
+        ]
 
         st.subheader("SEO Keywords")
         st.write(keywords)
+
+        st.subheader("Meta Description")
+        st.write(meta)
+
+        st.subheader("Article Outline")
+        st.write(outline)
