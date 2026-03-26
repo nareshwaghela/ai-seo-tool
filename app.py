@@ -1,82 +1,137 @@
 import streamlit as st
 import random
+from PIL import Image
 
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
-    page_title="AI SEO Writer (Free)",
+    page_title="AI SEO Suite",
     page_icon="🚀",
     layout="wide"
 )
 
 # ---------- HEADER ----------
 st.markdown("""
-<h1 style='text-align:center;'>🚀 AI SEO Writer</h1>
-<p style='text-align:center;'>Generate SEO content without API</p>
+<h1 style='text-align:center;'>🚀 AI SEO Suite</h1>
+<p style='text-align:center;'>All-in-one SEO content and analysis toolkit</p>
 """, unsafe_allow_html=True)
 
 # ---------- SIDEBAR ----------
+st.sidebar.title("SEO Dashboard")
+
 tool = st.sidebar.selectbox(
     "Select Tool",
     [
         "SEO Generator",
-        "AI Article Writer"
+        "Blog Title Generator",
+        "Keyword Difficulty Checker",
+        "Competitor Analysis",
+        "AI Article Writer",
+        "Image SEO Generator"
     ]
 )
 
-# ---------- SEO GENERATOR ----------
+# ------------------------------------------------
+# SEO GENERATOR
+# ------------------------------------------------
+
 if tool == "SEO Generator":
 
-    st.header("SEO Content Generator")
+    st.header("SEO Keyword Generator")
 
     topic = st.text_input("Enter Topic")
 
-    if st.button("Generate SEO Content"):
+    if st.button("Generate Keywords"):
 
-        if topic == "":
-            st.warning("Please enter topic")
+        keywords = [
+            f"best {topic}",
+            f"{topic} tutorial",
+            f"{topic} guide",
+            f"{topic} tools",
+            f"{topic} tips",
+            f"{topic} strategies",
+            f"{topic} examples",
+            f"{topic} ideas"
+        ]
 
-        else:
+        st.subheader("SEO Keywords")
 
-            keywords = [
-                f"best {topic}",
-                f"{topic} tutorial",
-                f"{topic} guide",
-                f"{topic} tools",
-                f"{topic} examples",
-                f"{topic} tips",
-                f"{topic} strategies"
-            ]
+        for k in keywords:
+            st.write("•", k)
 
-            meta = f"Learn everything about {topic}. Complete guide, tips and tools."
+# ------------------------------------------------
+# BLOG TITLE GENERATOR
+# ------------------------------------------------
 
-            outline = [
-                f"What is {topic}",
-                f"Benefits of {topic}",
-                f"Best {topic} tools",
-                f"How to use {topic}",
-                f"Future of {topic}"
-            ]
+if tool == "Blog Title Generator":
 
-            col1,col2 = st.columns(2)
+    st.header("Blog Title Generator")
 
-            with col1:
+    topic = st.text_input("Enter Topic")
 
-                st.subheader("SEO Keywords")
+    if st.button("Generate Titles"):
 
-                for k in keywords:
-                    st.write("•",k)
+        titles = [
+            f"10 Best {topic} Tips for Beginners",
+            f"The Ultimate Guide to {topic}",
+            f"How to Master {topic} in 2026",
+            f"{topic}: Everything You Need to Know",
+            f"Top Strategies for {topic}",
+            f"Why {topic} is Important Today"
+        ]
 
-                st.subheader("Meta Description")
-                st.write(meta)
+        st.subheader("Generated Blog Titles")
 
-            with col2:
+        for t in titles:
+            st.write("•", t)
 
-                st.subheader("Article Outline")
+# ------------------------------------------------
+# KEYWORD DIFFICULTY
+# ------------------------------------------------
 
-                for o in outline:
-                    st.write("•",o)
+if tool == "Keyword Difficulty Checker":
 
-# ---------- ARTICLE WRITER ----------
+    st.header("Keyword Difficulty Checker")
+
+    keyword = st.text_input("Enter Keyword")
+
+    if st.button("Check Difficulty"):
+
+        difficulty = random.randint(20, 90)
+
+        st.subheader("Keyword Difficulty Score")
+
+        st.progress(difficulty)
+
+        st.write(f"Estimated difficulty: **{difficulty}/100**")
+
+# ------------------------------------------------
+# COMPETITOR ANALYSIS
+# ------------------------------------------------
+
+if tool == "Competitor Analysis":
+
+    st.header("Competitor Content Analysis")
+
+    topic = st.text_input("Enter Topic")
+
+    if st.button("Analyze Competitors"):
+
+        competitors = [
+            f"{topic} guide by HubSpot",
+            f"{topic} tutorial by Ahrefs",
+            f"{topic} strategies by Neil Patel",
+            f"{topic} tips by Backlinko"
+        ]
+
+        st.subheader("Top Competitor Content")
+
+        for c in competitors:
+            st.write("•", c)
+
+# ------------------------------------------------
+# ARTICLE WRITER
+# ------------------------------------------------
+
 if tool == "AI Article Writer":
 
     st.header("AI Article Writer")
@@ -85,51 +140,72 @@ if tool == "AI Article Writer":
 
     if st.button("Generate Article"):
 
-        if topic == "":
-            st.warning("Enter topic")
-
-        else:
-
-            article = f"""
+        article = f"""
 Introduction
 
-{topic} is becoming increasingly popular in the modern digital world.
+{topic} is becoming increasingly important in modern digital marketing.
 
 What is {topic}
 
-{topic} refers to tools and strategies that help people work more efficiently.
+{topic} refers to strategies and tools that help businesses grow online.
 
 Benefits of {topic}
 
-Using {topic} can save time, increase productivity, and improve results.
+Using {topic} can improve productivity, increase traffic, and boost results.
 
 Best Tools
 
-Many powerful tools support {topic} and help businesses automate tasks.
-
-How to Use {topic}
-
-To use {topic}, start by identifying your goals and selecting the right tools.
+Many tools exist that allow businesses to use {topic} effectively.
 
 Future of {topic}
 
-The future of {topic} is promising as artificial intelligence and automation continue to grow.
+The future of {topic} looks promising as AI and automation continue to evolve.
 """
 
-            st.subheader("Generated Article")
+        st.subheader("Generated Article")
 
-            editor = st.text_area(
-                "Edit Article",
-                article,
-                height=350
-            )
+        editor = st.text_area(
+            "Edit Article",
+            article,
+            height=350
+        )
 
-            word_count = len(editor.split())
+        word_count = len(editor.split())
 
-            st.info(f"Word Count: {word_count}")
+        st.info(f"Word Count: {word_count}")
 
-            st.download_button(
-                "Download Article",
-                editor,
-                file_name="article.txt"
-            )
+        st.download_button(
+            "Download Article",
+            editor,
+            file_name="article.txt"
+        )
+
+# ------------------------------------------------
+# IMAGE SEO GENERATOR
+# ------------------------------------------------
+
+if tool == "Image SEO Generator":
+
+    st.header("Image SEO Generator")
+
+    uploaded = st.file_uploader(
+        "Upload Image",
+        type=["png", "jpg", "jpeg"]
+    )
+
+    if uploaded:
+
+        img = Image.open(uploaded)
+
+        st.image(img, caption="Uploaded Image")
+
+        captions = [
+            "Artificial intelligence technology concept",
+            "Digital marketing automation illustration",
+            "AI tools and workflow visualization",
+            "Modern SEO analytics dashboard"
+        ]
+
+        st.subheader("Suggested Image Alt Text")
+
+        st.write(random.choice(captions))
