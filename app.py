@@ -531,7 +531,7 @@ if tool == "Google Keyword Scraper":
 
     if st.button("🔍 Scrape Google Keywords", use_container_width=True):
         if not topic:
-            st.warning("Keyword daalna padega!")
+            st.warning("Keyword enter!")
         elif not PYTRENDS_OK:
             st.error("pytrends install karo: `pip install pytrends`")
         else:
