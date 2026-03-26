@@ -32,14 +32,16 @@ tool = st.sidebar.selectbox(
 
 # Article generator
 def generate_article(topic):
+
     year = datetime.now().year
+
     article = f"""
 # The Complete Guide to {topic}
 
 ## Introduction
 {topic} has become one of the most important strategies for businesses online.
 
-In this guide you will learn everything about {topic}, including strategies, tools, and examples.
+In this guide you will learn everything about {topic}, including strategies and examples.
 
 ## What is {topic}?
 {topic} is the process of improving visibility, traffic, and engagement online.
@@ -48,16 +50,11 @@ In this guide you will learn everything about {topic}, including strategies, too
 Competition online is increasing rapidly, and businesses must optimize their strategies.
 
 ## Step-by-Step Strategy
-1. Research your audience and keywords.
-2. Create valuable content.
-3. Optimize pages for search engines.
-4. Promote through social media and email.
 
-## Best Tools
-- Google Analytics
-- Google Search Console
-- Ahrefs
-- SEMrush
+1. Research your audience and keywords
+2. Create valuable content
+3. Optimize pages for search engines
+4. Promote through social media
 
 ## Conclusion
 By implementing the strategies in this guide, you can build a successful {topic} strategy.
