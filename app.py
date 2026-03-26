@@ -1,26 +1,59 @@
 import streamlit as st
+from PIL import Image
 
-st.title("AI SEO Automation Tool")
+# Page configuration
+st.set_page_config(
+    page_title="AI SEO Automation Tool",
+    page_icon="🚀",
+    layout="wide"
+)
 
+# Header
+st.markdown(
+    """
+    <h1 style='text-align: center;'>🚀 AI SEO Automation Tool</h1>
+    <p style='text-align: center;'>Generate SEO Keywords, Meta Description and Article Ideas Instantly</p>
+    """,
+    unsafe_allow_html=True
+)
+
+# Sidebar
+st.sidebar.title("AI SEO Tool")
+st.sidebar.info("Upload an image or enter a topic to generate SEO content.")
+
+# Image Upload
+uploaded_image = st.sidebar.file_uploader(
+    "Upload an Image (optional)", type=["png", "jpg", "jpeg"]
+)
+
+if uploaded_image:
+    image = Image.open(uploaded_image)
+    st.sidebar.image(image, caption="Uploaded Image", use_column_width=True)
+
+# Main Input
 topic = st.text_input("Enter Topic")
 
-if st.button("Generate SEO Content"):
+generate = st.button("Generate SEO Content")
+
+if generate:
 
     if topic == "":
         st.warning("Please enter a topic")
-
     else:
 
+        # SEO Keywords
         keywords = [
             f"best {topic}",
-            f"{topic} guide",
             f"{topic} tutorial",
+            f"{topic} guide",
             f"{topic} examples",
             f"{topic} tools"
         ]
 
-        meta = f"Learn everything about {topic}. Complete guide, tools, and tips."
+        # Meta description
+        meta = f"Learn everything about {topic}. Complete guide, tools, and examples."
 
+        # Outline
         outline = [
             f"What is {topic}",
             f"Benefits of {topic}",
@@ -29,38 +62,43 @@ if st.button("Generate SEO Content"):
             f"Future of {topic}"
         ]
 
+        # Article
         article = f"""
 Introduction
 
-{topic} is becoming increasingly important in modern technology and digital productivity.
+{topic} is becoming increasingly important in modern technology.
 
 What is {topic}
 
-{topic} refers to tools and techniques that help automate tasks and improve efficiency.
+{topic} refers to tools and technologies that help automate tasks and improve productivity.
 
 Benefits of {topic}
 
-Using {topic} can save time, increase productivity, and simplify complex tasks.
+Using {topic} can improve efficiency and save time.
 
 Best Tools
 
-Many tools related to {topic} help individuals and businesses work smarter.
+Many powerful tools related to {topic} are available today.
 
 Future of {topic}
 
-The future of {topic} looks promising as AI and automation continue to evolve.
+The future of {topic} looks promising as AI continues to evolve.
 """
 
-        st.subheader("SEO Keywords")
-        for k in keywords:
-            st.write("•", k)
+        col1, col2 = st.columns(2)
 
-        st.subheader("Meta Description")
-        st.write(meta)
+        with col1:
+            st.subheader("SEO Keywords")
+            for k in keywords:
+                st.write("•", k)
 
-        st.subheader("Article Outline")
-        for o in outline:
-            st.write("•", o)
+            st.subheader("Meta Description")
+            st.write(meta)
+
+        with col2:
+            st.subheader("Article Outline")
+            for o in outline:
+                st.write("•", o)
 
         st.subheader("Generated Article")
         st.write(article)
