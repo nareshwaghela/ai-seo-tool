@@ -1,5 +1,5 @@
 import openai
-import google.generativeai as genai
+import google.generativeai
 import anthropic
 import streamlit as st
 import random
