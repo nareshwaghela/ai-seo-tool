@@ -570,7 +570,7 @@ if tool == "Google Keyword Scraper":
                             for _, row in top_df.head(15).iterrows():
                                 kw_pill(row['query'], score=f"↑{int(row['value'])}", badge_color="#34d399")
                         else:
-                            st.info("Koi top keyword nahi mila.")
+                            st.info("top keyword not found.")
                     with col_b:
                         st.markdown("<div style='font-weight:600;color:#fbbf24;margin-bottom:.5rem;'>🚀 Rising Keywords</div>", unsafe_allow_html=True)
                         if rising_df is not None and not rising_df.empty:
@@ -583,7 +583,7 @@ if tool == "Google Keyword Scraper":
                                 </div>
                                 """, unsafe_allow_html=True)
                         else:
-                            st.info("Koi rising keyword nahi mila.")
+                            st.info("rising keyword not found.")
 
                     st.markdown("<div style='font-weight:600;color:#a5a0ff;margin:1rem 0 .5rem;'>💡 Long-Tail Keywords</div>", unsafe_allow_html=True)
                     for m in ["best", "how to", "guide", "tips", "tools for", "vs", "for beginners", f"in {datetime.now().year}", "free", "tutorial"]:
