@@ -821,7 +821,7 @@ elif tool == "AI Blog Writer":
 # ══════════════════════════════════════════════════════════════════════════════
 elif tool == "Blog Title Generator":
     card("Blog Title Generator", "📝")
-    topic = st.text_input("Topic daalo", placeholder="e.g. email marketing")
+    topic = st.text_input("Enter topic", placeholder="e.g. email marketing")
 
     if st.button("Generate Titles", use_container_width=True):
         if not topic:
@@ -853,7 +853,7 @@ elif tool == "Blog Title Generator":
 # ══════════════════════════════════════════════════════════════════════════════
 elif tool == "Keyword Difficulty Checker":
     card("Keyword Difficulty Checker", "📊")
-    keyword = st.text_input("Keyword daalo", placeholder="e.g. best CRM software")
+    keyword = st.text_input("Enter keyword", placeholder="e.g. best CRM software")
 
     if st.button("Check Difficulty", use_container_width=True):
         if not keyword:
@@ -884,7 +884,7 @@ elif tool == "Keyword Difficulty Checker":
 # ══════════════════════════════════════════════════════════════════════════════
 elif tool == "Competitor Analysis":
     card("Competitor Content Analysis", "🏆")
-    topic = st.text_input("Topic / Niche daalo", placeholder="e.g. project management software")
+    topic = st.text_input("Enter topic or niche", placeholder="e.g. project management software")
 
     if st.button("Analyse Competitors", use_container_width=True):
         if not topic:
@@ -926,7 +926,7 @@ elif tool == "Competitor Analysis":
 # ══════════════════════════════════════════════════════════════════════════════
 elif tool == "Image SEO Generator":
     card("Image SEO Generator", "🖼️")
-    uploaded = st.file_uploader("Image upload karo", type=["png", "jpg", "jpeg"])
+    uploaded = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
 
     if uploaded:
         img = Image.open(uploaded)
