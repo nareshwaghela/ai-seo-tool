@@ -1,36 +1,60 @@
 import streamlit as st
 from PIL import Image
 
-# Page configuration
 st.set_page_config(
     page_title="AI SEO Automation Tool",
     page_icon="🚀",
     layout="wide"
 )
 
-# Header
-st.markdown(
-    """
-    <h1 style='text-align: center;'>🚀 AI SEO Automation Tool</h1>
-    <p style='text-align: center;'>Generate SEO Keywords, Meta Description and Article Ideas Instantly</p>
-    """,
-    unsafe_allow_html=True
-)
+# -------- Custom CSS --------
+st.markdown("""
+<style>
 
-# Sidebar
-st.sidebar.title("AI SEO Tool")
-st.sidebar.info("Upload an image or enter a topic to generate SEO content.")
+.main-title{
+font-size:48px;
+font-weight:700;
+text-align:center;
+background: linear-gradient(90deg,#00c6ff,#0072ff);
+-webkit-background-clip:text;
+color:transparent;
+}
 
-# Image Upload
+.subtitle{
+text-align:center;
+color:gray;
+margin-bottom:40px;
+}
+
+.card{
+padding:20px;
+border-radius:10px;
+background:#111827;
+margin-bottom:20px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# -------- Header --------
+st.markdown('<div class="main-title">AI SEO Automation Tool</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Generate SEO Keywords, Articles & Content Ideas Instantly</div>', unsafe_allow_html=True)
+
+# -------- Theme Toggle --------
+theme = st.toggle("🌙 Dark Mode")
+
+# -------- Sidebar --------
+st.sidebar.title("Tools")
+
 uploaded_image = st.sidebar.file_uploader(
-    "Upload an Image (optional)", type=["png", "jpg", "jpeg"]
+    "Upload Image (optional)", type=["png","jpg","jpeg"]
 )
 
 if uploaded_image:
     image = Image.open(uploaded_image)
-    st.sidebar.image(image, caption="Uploaded Image", use_column_width=True)
+    st.sidebar.image(image, caption="Uploaded Image")
 
-# Main Input
+# -------- Topic Input --------
 topic = st.text_input("Enter Topic")
 
 generate = st.button("Generate SEO Content")
@@ -39,9 +63,9 @@ if generate:
 
     if topic == "":
         st.warning("Please enter a topic")
+
     else:
 
-        # SEO Keywords
         keywords = [
             f"best {topic}",
             f"{topic} tutorial",
@@ -50,10 +74,8 @@ if generate:
             f"{topic} tools"
         ]
 
-        # Meta description
         meta = f"Learn everything about {topic}. Complete guide, tools, and examples."
 
-        # Outline
         outline = [
             f"What is {topic}",
             f"Benefits of {topic}",
@@ -62,7 +84,6 @@ if generate:
             f"Future of {topic}"
         ]
 
-        # Article
         article = f"""
 Introduction
 
@@ -70,27 +91,26 @@ Introduction
 
 What is {topic}
 
-{topic} refers to tools and technologies that help automate tasks and improve productivity.
+{topic} refers to tools that improve productivity and automate tasks.
 
 Benefits of {topic}
 
-Using {topic} can improve efficiency and save time.
-
-Best Tools
-
-Many powerful tools related to {topic} are available today.
+Using {topic} helps businesses and individuals work faster.
 
 Future of {topic}
 
-The future of {topic} looks promising as AI continues to evolve.
+The future of {topic} looks promising with AI and automation growth.
 """
 
-        col1, col2 = st.columns(2)
+        # -------- SEO Score --------
+        seo_score = 85
+
+        col1,col2 = st.columns(2)
 
         with col1:
             st.subheader("SEO Keywords")
             for k in keywords:
-                st.write("•", k)
+                st.write("•",k)
 
             st.subheader("Meta Description")
             st.write(meta)
@@ -98,7 +118,17 @@ The future of {topic} looks promising as AI continues to evolve.
         with col2:
             st.subheader("Article Outline")
             for o in outline:
-                st.write("•", o)
+                st.write("•",o)
+
+            st.subheader("SEO Score")
+            st.progress(seo_score)
 
         st.subheader("Generated Article")
         st.write(article)
+
+        # -------- Download Button --------
+        st.download_button(
+            label="Download Article",
+            data=article,
+            file_name="seo_article.txt"
+        )
