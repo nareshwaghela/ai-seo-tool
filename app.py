@@ -1,21 +1,20 @@
 import streamlit as st
-from PIL import Image
-import random
+from fpdf import FPDF
 
-# ---------------- PAGE CONFIG ----------------
+# ---------- PAGE CONFIG ----------
 st.set_page_config(
     page_title="AI SEO Automation Platform",
     page_icon="🚀",
     layout="wide"
 )
 
-# ---------------- HEADER ----------------
+# ---------- HEADER ----------
 st.markdown("""
 <h1 style='text-align:center;'>🚀 AI SEO Automation Platform</h1>
 <p style='text-align:center;'>Generate SEO content, keywords and AI articles</p>
 """, unsafe_allow_html=True)
 
-# ---------------- SIDEBAR ----------------
+# ---------- SIDEBAR ----------
 st.sidebar.title("Dashboard")
 
 menu = st.sidebar.selectbox(
@@ -23,7 +22,7 @@ menu = st.sidebar.selectbox(
     ["SEO Generator", "AI Article Writer"]
 )
 
-# ---------------- SEO GENERATOR ----------------
+# ---------- SEO GENERATOR ----------
 if menu == "SEO Generator":
 
     st.header("SEO Content Generator")
@@ -74,7 +73,7 @@ if menu == "SEO Generator":
                 for o in outline:
                     st.write("•", o)
 
-# ---------------- ARTICLE WRITER ----------------
+# ---------- ARTICLE WRITER ----------
 if menu == "AI Article Writer":
 
     st.header("AI Article Writer")
@@ -112,10 +111,42 @@ The future of {topic} looks promising as artificial intelligence and automation 
 
             st.subheader("Generated Article")
 
-            st.write(article)
+            # -------- AI Writing Editor --------
+            edited_article = st.text_area(
+                "Edit Article",
+                article,
+                height=300
+            )
 
+            # -------- Word Counter --------
+            word_count = len(edited_article.split())
+            st.info(f"Word Count: {word_count}")
+
+            # -------- Copy Button --------
+            st.code(edited_article)
+
+            # -------- Download TXT --------
             st.download_button(
-                label="Download Article",
-                data=article,
+                "Download Article (TXT)",
+                edited_article,
                 file_name="ai_article.txt"
             )
+
+            # -------- Export PDF --------
+            if st.button("Export as PDF"):
+
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+
+                for line in edited_article.split("\n"):
+                    pdf.cell(0,10,line,ln=True)
+
+                pdf.output("article.pdf")
+
+                with open("article.pdf","rb") as f:
+                    st.download_button(
+                        "Download PDF",
+                        f,
+                        file_name="article.pdf"
+                    )
