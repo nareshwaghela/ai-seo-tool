@@ -1,5 +1,3 @@
-import openai
-import anthropic
 import streamlit as st
 import random
 import time
