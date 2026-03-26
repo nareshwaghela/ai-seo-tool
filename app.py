@@ -1,110 +1,135 @@
 import streamlit as st
-from openai import OpenAI
+import random
 
-# ---------- CONFIG ----------
+# ---------- PAGE CONFIG ----------
 st.set_page_config(
-    page_title="AI SEO Writer",
+    page_title="AI SEO Writer (Free)",
     page_icon="🚀",
     layout="wide"
 )
 
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
 # ---------- HEADER ----------
 st.markdown("""
 <h1 style='text-align:center;'>🚀 AI SEO Writer</h1>
-<p style='text-align:center;'>Generate SEO articles, keywords and internal links</p>
+<p style='text-align:center;'>Generate SEO content without API</p>
 """, unsafe_allow_html=True)
 
-# ---------- TOOL SELECT ----------
+# ---------- SIDEBAR ----------
 tool = st.sidebar.selectbox(
     "Select Tool",
     [
-        "AI Article Writer",
-        "SEO Keyword Generator"
+        "SEO Generator",
+        "AI Article Writer"
     ]
 )
+
+# ---------- SEO GENERATOR ----------
+if tool == "SEO Generator":
+
+    st.header("SEO Content Generator")
+
+    topic = st.text_input("Enter Topic")
+
+    if st.button("Generate SEO Content"):
+
+        if topic == "":
+            st.warning("Please enter topic")
+
+        else:
+
+            keywords = [
+                f"best {topic}",
+                f"{topic} tutorial",
+                f"{topic} guide",
+                f"{topic} tools",
+                f"{topic} examples",
+                f"{topic} tips",
+                f"{topic} strategies"
+            ]
+
+            meta = f"Learn everything about {topic}. Complete guide, tips and tools."
+
+            outline = [
+                f"What is {topic}",
+                f"Benefits of {topic}",
+                f"Best {topic} tools",
+                f"How to use {topic}",
+                f"Future of {topic}"
+            ]
+
+            col1,col2 = st.columns(2)
+
+            with col1:
+
+                st.subheader("SEO Keywords")
+
+                for k in keywords:
+                    st.write("•",k)
+
+                st.subheader("Meta Description")
+                st.write(meta)
+
+            with col2:
+
+                st.subheader("Article Outline")
+
+                for o in outline:
+                    st.write("•",o)
 
 # ---------- ARTICLE WRITER ----------
 if tool == "AI Article Writer":
 
-    st.header("AI Blog Article Generator")
+    st.header("AI Article Writer")
 
-    topic = st.text_input("Enter Topic")
+    topic = st.text_input("Enter Article Topic")
 
     if st.button("Generate Article"):
 
         if topic == "":
-            st.warning("Enter topic first")
+            st.warning("Enter topic")
 
         else:
 
-            prompt = f"""
-Write a 1500 word SEO optimized blog article about:
+            article = f"""
+Introduction
 
-{topic}
+{topic} is becoming increasingly popular in the modern digital world.
 
-Include:
-- introduction
-- headings
-- internal linking suggestions
-- conclusion
+What is {topic}
 
-Make it blog ready.
+{topic} refers to tools and strategies that help people work more efficiently.
+
+Benefits of {topic}
+
+Using {topic} can save time, increase productivity, and improve results.
+
+Best Tools
+
+Many powerful tools support {topic} and help businesses automate tasks.
+
+How to Use {topic}
+
+To use {topic}, start by identifying your goals and selecting the right tools.
+
+Future of {topic}
+
+The future of {topic} is promising as artificial intelligence and automation continue to grow.
 """
-
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "user", "content": prompt}
-                ]
-            )
-
-            article = response.choices[0].message.content
 
             st.subheader("Generated Article")
 
-            edited = st.text_area(
+            editor = st.text_area(
                 "Edit Article",
                 article,
-                height=400
+                height=350
             )
 
-            word_count = len(edited.split())
+            word_count = len(editor.split())
+
             st.info(f"Word Count: {word_count}")
 
             st.download_button(
                 "Download Article",
-                edited,
-                file_name="seo_article.txt"
+                editor,
+                file_name="article.txt"
             )
-
-# ---------- KEYWORD TOOL ----------
-if tool == "SEO Keyword Generator":
-
-    st.header("SEO Keyword Generator")
-
-    topic = st.text_input("Enter Keyword Topic")
-
-    if st.button("Generate Keywords"):
-
-        prompt = f"""
-Generate 20 SEO keywords for:
-
-{topic}
-
-Return as bullet list.
-"""
-
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        )
-
-        keywords = response.choices[0].message.content
-
-        st.subheader("SEO Keywords")
-
-        st.write(keywords)
