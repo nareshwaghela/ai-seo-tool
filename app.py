@@ -1,8 +1,4 @@
 import streamlit as st
-from openai import OpenAI
-
-# Load API key
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("AI SEO Automation Tool")
 
@@ -14,67 +10,57 @@ if st.button("Generate SEO Content"):
         st.warning("Please enter a topic")
 
     else:
-        try:
 
-            # SEO Keywords
-            keyword_prompt = f"Generate 10 SEO keywords for {topic}"
+        keywords = [
+            f"best {topic}",
+            f"{topic} guide",
+            f"{topic} tutorial",
+            f"{topic} examples",
+            f"{topic} tools"
+        ]
 
-            keyword_response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": keyword_prompt}]
-            )
+        meta = f"Learn everything about {topic}. Complete guide, tools, and tips."
 
-            keywords = keyword_response.choices[0].message.content.split("\n")
+        outline = [
+            f"What is {topic}",
+            f"Benefits of {topic}",
+            f"Best {topic} tools",
+            f"How to use {topic}",
+            f"Future of {topic}"
+        ]
 
-            st.subheader("SEO Keywords")
-            for k in keywords:
-                if k.strip():
-                    st.write("•", k)
+        article = f"""
+Introduction
 
+{topic} is becoming increasingly important in modern technology and digital productivity.
 
-            # Meta Description
-            meta_prompt = f"Write an SEO meta description for {topic}"
+What is {topic}
 
-            meta_response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": meta_prompt}]
-            )
+{topic} refers to tools and techniques that help automate tasks and improve efficiency.
 
-            meta = meta_response.choices[0].message.content
+Benefits of {topic}
 
-            st.subheader("Meta Description")
-            st.write(meta)
+Using {topic} can save time, increase productivity, and simplify complex tasks.
 
+Best Tools
 
-            # Article Outline
-            outline_prompt = f"Create a blog article outline about {topic}"
+Many tools related to {topic} help individuals and businesses work smarter.
 
-            outline_response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": outline_prompt}]
-            )
+Future of {topic}
 
-            outline = outline_response.choices[0].message.content.split("\n")
+The future of {topic} looks promising as AI and automation continue to evolve.
+"""
 
-            st.subheader("Article Outline")
-            for o in outline:
-                if o.strip():
-                    st.write("•", o)
+        st.subheader("SEO Keywords")
+        for k in keywords:
+            st.write("•", k)
 
+        st.subheader("Meta Description")
+        st.write(meta)
 
-            # Full Article
-            article_prompt = f"Write a detailed blog article about {topic} with headings"
+        st.subheader("Article Outline")
+        for o in outline:
+            st.write("•", o)
 
-            article_response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": article_prompt}]
-            )
-
-            article = article_response.choices[0].message.content
-
-            st.subheader("Generated Article")
-            st.write(article)
-
-        except Exception as e:
-            st.error("OpenAI API limit reached or billing not enabled.")
-            st.info("Add billing at https://platform.openai.com/account/billing")
+        st.subheader("Generated Article")
+        st.write(article)
