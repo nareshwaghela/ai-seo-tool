@@ -1,24 +1,42 @@
-# AI SEO Tool
+# AI SEO Automation Tool
 
-AI SEO Automation Tool that generates SEO optimized articles, keywords, internal links, and HackerNoon-ready content using generative AI.
+AI SEO Automation Tool helps bloggers, developers, and marketers generate SEO keywords, meta descriptions, and article outlines quickly.
 
 ## Features
 
-- SEO Article Generator
-- Keyword Suggestions
-- AI Content Creation
-- HackerNoon Format Ready
+- Generate SEO Keywords
+- Generate Meta Descriptions
+- Create Blog Article Outline
+- Simple AI-powered SEO helper
+
+## How It Works
+
+1. Enter a topic
+2. Click "Generate SEO Content"
+3. Get SEO keywords, meta description, and article outline instantly.
+
+## Tech Stack
+
+- Python
+- Streamlit
+- OpenAI API
 
 ## Installation
 
+Clone the repository
+
 pip install -r requirements.txt
 
-## Run
+Run the app
 
 streamlit run app.py
-## Demo Features
 
-- Generate SEO Keywords
-- Generate Meta Description
-- AI Article Creation
-- HackerNoon Content Format
+## Use Case
+
+This tool helps content creators quickly generate SEO optimized content ideas and outlines.
+
+## Future Improvements
+
+- Full blog generator
+- Keyword difficulty checker
+- Competitor SEO analysis
