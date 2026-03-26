@@ -46,3 +46,15 @@ This tool helps content creators quickly generate SEO optimized content ideas an
 SEO research can take a long time for bloggers and content creators.
 
 This tool automates the process by generating SEO keywords, meta descriptions, and article outlines instantly. It helps users quickly structure content ideas and improve productivity.
+
+## Project Architecture
+
+The application follows a simple architecture:
+
+User Input → Streamlit Interface → AI Processing → SEO Content Output
+
+Components:
+
+- **Streamlit UI** – Handles user interaction and displays results.
+- **AI Processing Layer** – Generates SEO keywords, meta descriptions, and article outlines.
+- **SEO Output Generator** – Formats the generated data for easy use by bloggers and developers.
