@@ -8,21 +8,16 @@ from datetime import datetime
 try:
     from pytrends.request import TrendReq
     PYTRENDS_OK = True
-except:
+except Exception:
     PYTRENDS_OK = False
 
-# PAGE CONFIG
-st.set_page_config(
-    page_title="AI SEO Suite",
-    page_icon="🚀",
-    layout="wide"
-)
+# Page configuration
+st.set_page_config(page_title="AI SEO Suite", page_icon="🚀", layout="wide")
 
-# HEADER
 st.title("🚀 AI SEO Suite")
 st.write("Free SEO Tools: Keyword Research • Blog Writer • Competitor Analysis")
 
-# SIDEBAR
+# Sidebar
 tool = st.sidebar.selectbox(
     "Select Tool",
     [
@@ -35,11 +30,9 @@ tool = st.sidebar.selectbox(
     ]
 )
 
-# ARTICLE GENERATOR
+# Article generator
 def generate_article(topic):
-
     year = datetime.now().year
-
     article = f"""
 # The Complete Guide to {topic}
 
@@ -55,18 +48,10 @@ In this guide you will learn everything about {topic}, including strategies, too
 Competition online is increasing rapidly, and businesses must optimize their strategies.
 
 ## Step-by-Step Strategy
-
-### 1. Research
-Understand your audience and keywords.
-
-### 2. Content
-Create helpful and informative content.
-
-### 3. Optimization
-Optimize your pages for search engines.
-
-### 4. Promotion
-Promote your content through social media and email.
+1. Research your audience and keywords.
+2. Create valuable content.
+3. Optimize pages for search engines.
+4. Promote through social media and email.
 
 ## Best Tools
 - Google Analytics
@@ -79,70 +64,54 @@ By implementing the strategies in this guide, you can build a successful {topic}
 """
     return article
 
-# KEYWORD SCRAPER
+# Keyword Scraper
 if tool == "Keyword Scraper":
-
     st.header("🔍 Google Keyword Scraper")
-
     topic = st.text_input("Enter seed keyword")
 
     if st.button("Scrape Keywords"):
-
         if not topic:
             st.warning("Please enter a keyword.")
         elif not PYTRENDS_OK:
-            st.error("pytrends not installed. Run: pip install pytrends")
+            st.error("pytrends is not installed. Run: pip install pytrends")
         else:
-
             with st.spinner("Fetching data from Google Trends..."):
-
                 pytrends = TrendReq()
                 pytrends.build_payload([topic])
-
                 data = pytrends.related_queries()
                 top = data[topic]["top"]
 
                 if top is not None:
-                    for i,row in top.head(10).iterrows():
-                        st.write("•",row["query"])
+                    for _, row in top.head(10).iterrows():
+                        st.write("•", row["query"])
+                else:
+                    st.info("No keyword data found.")
 
-# BLOG WRITER
+# Blog Writer
 elif tool == "Blog Writer":
-
     st.header("✍️ AI Blog Writer")
-
     topic = st.text_input("Enter article topic")
 
     if st.button("Generate Article"):
-
         if not topic:
             st.warning("Please enter a topic.")
-
         else:
             with st.spinner("Generating article..."):
-
                 time.sleep(1)
-
                 article = generate_article(topic)
 
-                st.success("Article generated!")
+            st.success("Article generated!")
+            st.markdown(article)
 
-                st.markdown(article)
-
-# BLOG TITLE GENERATOR
+# Blog Title Generator
 elif tool == "Blog Title Generator":
-
     st.header("📝 Blog Title Generator")
-
     topic = st.text_input("Enter topic")
 
     if st.button("Generate Titles"):
-
         if not topic:
             st.warning("Please enter a topic.")
-
         else:
-
             titles = [
                 f"10 Best {topic} Tips for Beginners",
                 f"The Ultimate Guide to {topic}",
@@ -154,68 +123,46 @@ elif tool == "Blog Title Generator":
             ]
 
             for t in titles:
-                st.write("•",t)
+                st.write("•", t)
 
-# KEYWORD DIFFICULTY
+# Keyword Difficulty
 elif tool == "Keyword Difficulty Checker":
-
     st.header("📊 Keyword Difficulty Checker")
-
     keyword = st.text_input("Enter keyword")
 
     if st.button("Check Difficulty"):
-
         if not keyword:
             st.warning("Please enter a keyword.")
-
         else:
-
-            difficulty = random.randint(20,90)
-            volume = random.randint(500,50000)
+            difficulty = random.randint(20, 90)
+            volume = random.randint(500, 50000)
 
             st.metric("Difficulty", difficulty)
             st.metric("Monthly Searches", volume)
 
-# COMPETITOR ANALYSIS
+# Competitor Analysis
 elif tool == "Competitor Analysis":
-
     st.header("🏆 Competitor Analysis")
-
     topic = st.text_input("Enter topic or niche")
 
     if st.button("Analyze"):
-
         if not topic:
             st.warning("Please enter a topic.")
-
         else:
-
-            competitors = [
-                "HubSpot",
-                "Ahrefs",
-                "Neil Patel",
-                "Backlinko",
-                "Moz"
-            ]
-
+            competitors = ["HubSpot", "Ahrefs", "Neil Patel", "Backlinko", "Moz"]
             for c in competitors:
-                st.write("•",c,"article about",topic)
+                st.write("•", c, "article about", topic)
 
-# IMAGE SEO
+# Image SEO Generator
 elif tool == "Image SEO Generator":
-
     st.header("🖼️ Image SEO Generator")
-
-    uploaded = st.file_uploader("Upload image",type=["png","jpg","jpeg"])
+    uploaded = st.file_uploader("Upload image", type=["png", "jpg", "jpeg"])
 
     if uploaded:
-
         img = Image.open(uploaded)
         st.image(img)
 
-        alt = st.text_input("Alt text","SEO optimized image")
-
-        name = uploaded.name.replace(" ","-").lower()
+        alt = st.text_input("Alt text", "SEO optimized image")
+        name = uploaded.name.replace(" ", "-").lower()
 
         st.code(f'<img src="{name}" alt="{alt}" loading="lazy">')
-```
