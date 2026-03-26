@@ -3,3 +3,4 @@ openai
 fpdf
 pytrends
 pillow
+geminiai
