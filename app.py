@@ -213,7 +213,7 @@ st.sidebar.markdown("""
     🔍 Live Google Trends data<br>
     ✍️ 550–750 word unique articles<br>
     🌐 Hindi, English + 8 languages<br>
-    📦 <code style='background:#26262f;padding:.1rem .3rem;border-radius:3px;color:#f0f0f5;'>pip install pytrends pillow</code>
+    
 </div>
 """, unsafe_allow_html=True)
 
