@@ -535,7 +535,7 @@ if tool == "Google Keyword Scraper":
         elif not PYTRENDS_OK:
             st.error("pytrends install karo: `pip install pytrends`")
         else:
-            with st.spinner("Google Trends se data fetch ho raha hai…"):
+            with st.spinner("Fetching data from Google Trends…"):
                 try:
                     pytrends = TrendReq(hl='en-US', tz=330)
                     pytrends.build_payload([topic], geo=geo_map[geo], timeframe='today 12-m')
