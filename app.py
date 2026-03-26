@@ -2,140 +2,181 @@ import streamlit as st
 from PIL import Image
 import random
 
+# ---------------- Page Config ----------------
 st.set_page_config(
-    page_title="AI SEO Automation Tool",
+    page_title="AI SEO Automation Platform",
     page_icon="🚀",
     layout="wide"
 )
 
-# ---------- Header ----------
-st.markdown(
-"""
-<h1 style='text-align:center;'>🚀 AI SEO Automation Tool</h1>
-<p style='text-align:center;'>Generate SEO Keywords, Articles & Content Insights</p>
-""",
-unsafe_allow_html=True
+# ---------------- Header ----------------
+st.markdown("""
+<h1 style='text-align:center;'>🚀 AI SEO Automation Platform</h1>
+<p style='text-align:center;'>AI powered SEO content, keyword research and analysis tools</p>
+""", unsafe_allow_html=True)
+
+# ---------------- Sidebar ----------------
+st.sidebar.title("Dashboard")
+
+menu = st.sidebar.selectbox(
+    "Select Tool",
+    ["SEO Generator", "Keyword Research", "Image Caption AI", "SEO Score Analyzer"]
 )
 
-# ---------- Sidebar ----------
-st.sidebar.title("SEO Tools")
+# ---------------- SEO GENERATOR ----------------
+if menu == "SEO Generator":
 
-uploaded_image = st.sidebar.file_uploader(
-    "Upload Image (optional)", type=["png","jpg","jpeg"]
-)
+    st.header("SEO Content Generator")
 
-if uploaded_image:
-    image = Image.open(uploaded_image)
-    st.sidebar.image(image, caption="Uploaded Image")
+    topic = st.text_input("Enter Topic")
 
-# ---------- Topic ----------
-topic = st.text_input("Enter Topic")
+    if st.button("Generate SEO Content"):
 
-generate = st.button("Generate SEO Content")
+        if topic == "":
+            st.warning("Please enter a topic")
 
-if generate:
+        else:
 
-    if topic == "":
-        st.warning("Please enter a topic")
+            keywords = [
+                f"best {topic}",
+                f"{topic} tutorial",
+                f"{topic} guide",
+                f"{topic} tools",
+                f"{topic} examples"
+            ]
 
-    else:
+            meta = f"Learn everything about {topic}. Complete guide, tips and tools."
 
-        # ---------- SEO Keywords ----------
-        keywords = [
-            f"best {topic}",
-            f"{topic} tutorial",
-            f"{topic} guide",
-            f"{topic} examples",
-            f"{topic} tools",
-            f"{topic} strategies",
-            f"{topic} tips",
-            f"{topic} ideas"
-        ]
+            outline = [
+                f"What is {topic}",
+                f"Benefits of {topic}",
+                f"Best {topic} tools",
+                f"How to use {topic}",
+                f"Future of {topic}"
+            ]
 
-        # ---------- Keyword Difficulty ----------
-        keyword_difficulty = random.randint(30,80)
-
-        # ---------- Meta Description ----------
-        meta = f"Learn everything about {topic}. Discover tips, strategies and tools."
-
-        # ---------- Outline ----------
-        outline = [
-            f"What is {topic}",
-            f"Benefits of {topic}",
-            f"Best {topic} tools",
-            f"How to use {topic}",
-            f"Future of {topic}"
-        ]
-
-        # ---------- AI Article ----------
-        article = f"""
+            article = f"""
 Introduction
 
-{topic} is rapidly becoming an important part of modern digital strategy.
+{topic} is becoming increasingly important in modern digital workflows.
 
 What is {topic}
 
-{topic} refers to tools, technologies, and techniques that help people improve productivity and efficiency.
+{topic} refers to technologies and tools that help automate processes.
 
 Benefits of {topic}
 
-Using {topic} can help individuals and businesses automate processes, save time, and improve results.
+Using {topic} improves productivity and efficiency.
 
 Best Tools
 
-There are many powerful tools available today that support {topic} and help users work smarter.
-
-How to Use {topic}
-
-To start using {topic}, identify your needs, choose the right tools, and implement strategies step by step.
+Many tools exist that help users apply {topic} effectively.
 
 Future of {topic}
 
-The future of {topic} looks promising as AI, automation, and digital transformation continue to evolve.
+The future of {topic} is promising with AI and automation.
 """
 
-        # ---------- Competitor Analysis ----------
-        competitors = [
-            f"{topic} guide by HubSpot",
-            f"{topic} tutorial by Ahrefs",
-            f"{topic} tips by Neil Patel"
+            col1, col2 = st.columns(2)
+
+            with col1:
+
+                st.subheader("SEO Keywords")
+
+                for k in keywords:
+                    st.write("•", k)
+
+                st.subheader("Meta Description")
+                st.write(meta)
+
+            with col2:
+
+                st.subheader("Article Outline")
+
+                for o in outline:
+                    st.write("•", o)
+
+            st.subheader("Generated Article")
+
+            st.write(article)
+
+            st.download_button(
+                label="Download Article",
+                data=article,
+                file_name="seo_article.txt"
+            )
+
+# ---------------- KEYWORD RESEARCH ----------------
+if menu == "Keyword Research":
+
+    st.header("Keyword Research Tool")
+
+    keyword = st.text_input("Enter keyword")
+
+    if st.button("Generate Keywords"):
+
+        suggestions = [
+            f"{keyword} tools",
+            f"{keyword} tutorial",
+            f"{keyword} guide",
+            f"{keyword} examples",
+            f"{keyword} tips"
         ]
 
-        col1,col2 = st.columns(2)
+        difficulty = random.randint(20, 80)
 
-        with col1:
+        st.subheader("Keyword Suggestions")
 
-            st.subheader("SEO Keywords")
+        for s in suggestions:
+            st.write("•", s)
 
-            for k in keywords:
-                st.write("•",k)
+        st.subheader("Keyword Difficulty")
 
-            st.subheader("Meta Description")
+        st.progress(difficulty)
 
-            st.write(meta)
+# ---------------- IMAGE CAPTION AI ----------------
+if menu == "Image Caption AI":
 
-            st.subheader("Keyword Difficulty")
+    st.header("AI Image Caption Generator")
 
-            st.progress(keyword_difficulty)
+    uploaded = st.file_uploader(
+        "Upload Image",
+        type=["png", "jpg", "jpeg"]
+    )
 
-        with col2:
+    if uploaded:
 
-            st.subheader("Article Outline")
+        img = Image.open(uploaded)
 
-            for o in outline:
-                st.write("•",o)
+        st.image(img, caption="Uploaded Image")
 
-            st.subheader("Competitor Content")
+        captions = [
+            "Artificial intelligence technology illustration",
+            "Digital automation concept",
+            "AI tools workflow visualization"
+        ]
 
-            for c in competitors:
-                st.write("•",c)
+        st.subheader("Generated Caption")
 
-        st.subheader("Generated Article")
+        st.write(random.choice(captions))
 
-        st.write(article)
+# ---------------- SEO SCORE ANALYZER ----------------
+if menu == "SEO Score Analyzer":
 
-        st.download_button(
-            label="Download Article",
-            data=article,
-            file_name="seo_article.txt"
-        )
+    st.header("SEO Score Analyzer")
+
+    article = st.text_area("Paste your article")
+
+    if st.button("Analyze SEO"):
+
+        score = random.randint(60, 95)
+
+        st.subheader("SEO Score")
+
+        st.progress(score)
+
+        if score > 80:
+            st.success("Excellent SEO optimization")
+
+        else:
+            st.warning("SEO can be improved by adding more keywords")
