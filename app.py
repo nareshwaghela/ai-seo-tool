@@ -590,13 +590,13 @@ if tool == "Google Keyword Scraper":
                         kw_pill(f"{m} {topic}")
 
                 except Exception as e:
-                    st.error(f"Google Trends error: {e}\n\nZyada requests? 60 second wait karo phir try karo.")
+                    st.error(f"Google Trends error: {e}\n\nHigh Request? 60 second wait and try again.")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TOOL: AI BLOG WRITER — NO API KEY
+# TOOL: AI BLOG WRITER — 
 # ══════════════════════════════════════════════════════════════════════════════
 elif tool == "AI Blog Writer":
-    card("AI Blog Writer — 2000+ Words", "✍️")
+    card("AI Blog Writer — 750+ Words", "✍️")
 
     st.markdown("""
     <div style='background:#1e1e24;border:1px solid #34d39944;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.2rem;font-size:.88rem;color:#8b8b9e;'>
@@ -670,7 +670,7 @@ elif tool == "AI Blog Writer":
 elif tool == "Blog Title Generator":
     card("Blog Title Generator", "📝")
 
-    topic = st.text_input("Topic daalo", placeholder="e.g. email marketing")
+    topic = st.text_input("Topic Enter", placeholder="e.g. email marketing")
 
     if st.button("Generate Titles", use_container_width=True):
         if not topic:
@@ -707,7 +707,7 @@ elif tool == "Keyword Difficulty Checker":
 
     if st.button("Check Difficulty", use_container_width=True):
         if not keyword:
-            st.warning("Keyword daalna padega!")
+            st.warning("Keyword enter!")
         else:
             difficulty  = random.randint(20, 90)
             volume      = random.randint(500, 50000)
