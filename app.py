@@ -1,5 +1,6 @@
 import streamlit as st
 from PIL import Image
+import random
 
 st.set_page_config(
     page_title="AI SEO Automation Tool",
@@ -7,44 +8,17 @@ st.set_page_config(
     layout="wide"
 )
 
-# -------- Custom CSS --------
-st.markdown("""
-<style>
+# ---------- Header ----------
+st.markdown(
+"""
+<h1 style='text-align:center;'>🚀 AI SEO Automation Tool</h1>
+<p style='text-align:center;'>Generate SEO Keywords, Articles & Content Insights</p>
+""",
+unsafe_allow_html=True
+)
 
-.main-title{
-font-size:48px;
-font-weight:700;
-text-align:center;
-background: linear-gradient(90deg,#00c6ff,#0072ff);
--webkit-background-clip:text;
-color:transparent;
-}
-
-.subtitle{
-text-align:center;
-color:gray;
-margin-bottom:40px;
-}
-
-.card{
-padding:20px;
-border-radius:10px;
-background:#111827;
-margin-bottom:20px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# -------- Header --------
-st.markdown('<div class="main-title">AI SEO Automation Tool</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Generate SEO Keywords, Articles & Content Ideas Instantly</div>', unsafe_allow_html=True)
-
-# -------- Theme Toggle --------
-theme = st.toggle("🌙 Dark Mode")
-
-# -------- Sidebar --------
-st.sidebar.title("Tools")
+# ---------- Sidebar ----------
+st.sidebar.title("SEO Tools")
 
 uploaded_image = st.sidebar.file_uploader(
     "Upload Image (optional)", type=["png","jpg","jpeg"]
@@ -54,7 +28,7 @@ if uploaded_image:
     image = Image.open(uploaded_image)
     st.sidebar.image(image, caption="Uploaded Image")
 
-# -------- Topic Input --------
+# ---------- Topic ----------
 topic = st.text_input("Enter Topic")
 
 generate = st.button("Generate SEO Content")
@@ -66,16 +40,25 @@ if generate:
 
     else:
 
+        # ---------- SEO Keywords ----------
         keywords = [
             f"best {topic}",
             f"{topic} tutorial",
             f"{topic} guide",
             f"{topic} examples",
-            f"{topic} tools"
+            f"{topic} tools",
+            f"{topic} strategies",
+            f"{topic} tips",
+            f"{topic} ideas"
         ]
 
-        meta = f"Learn everything about {topic}. Complete guide, tools, and examples."
+        # ---------- Keyword Difficulty ----------
+        keyword_difficulty = random.randint(30,80)
 
+        # ---------- Meta Description ----------
+        meta = f"Learn everything about {topic}. Discover tips, strategies and tools."
+
+        # ---------- Outline ----------
         outline = [
             f"What is {topic}",
             f"Benefits of {topic}",
@@ -84,49 +67,73 @@ if generate:
             f"Future of {topic}"
         ]
 
+        # ---------- AI Article ----------
         article = f"""
 Introduction
 
-{topic} is becoming increasingly important in modern technology.
+{topic} is rapidly becoming an important part of modern digital strategy.
 
 What is {topic}
 
-{topic} refers to tools that improve productivity and automate tasks.
+{topic} refers to tools, technologies, and techniques that help people improve productivity and efficiency.
 
 Benefits of {topic}
 
-Using {topic} helps businesses and individuals work faster.
+Using {topic} can help individuals and businesses automate processes, save time, and improve results.
+
+Best Tools
+
+There are many powerful tools available today that support {topic} and help users work smarter.
+
+How to Use {topic}
+
+To start using {topic}, identify your needs, choose the right tools, and implement strategies step by step.
 
 Future of {topic}
 
-The future of {topic} looks promising with AI and automation growth.
+The future of {topic} looks promising as AI, automation, and digital transformation continue to evolve.
 """
 
-        # -------- SEO Score --------
-        seo_score = 85
+        # ---------- Competitor Analysis ----------
+        competitors = [
+            f"{topic} guide by HubSpot",
+            f"{topic} tutorial by Ahrefs",
+            f"{topic} tips by Neil Patel"
+        ]
 
         col1,col2 = st.columns(2)
 
         with col1:
+
             st.subheader("SEO Keywords")
+
             for k in keywords:
                 st.write("•",k)
 
             st.subheader("Meta Description")
+
             st.write(meta)
 
+            st.subheader("Keyword Difficulty")
+
+            st.progress(keyword_difficulty)
+
         with col2:
+
             st.subheader("Article Outline")
+
             for o in outline:
                 st.write("•",o)
 
-            st.subheader("SEO Score")
-            st.progress(seo_score)
+            st.subheader("Competitor Content")
+
+            for c in competitors:
+                st.write("•",c)
 
         st.subheader("Generated Article")
+
         st.write(article)
 
-        # -------- Download Button --------
         st.download_button(
             label="Download Article",
             data=article,
