@@ -679,11 +679,11 @@ if tool == "Google Keyword Scraper":
 
     if st.button("🔍 Scrape Keywords", use_container_width=True):
         if not topic:
-            st.warning("Keyword daalna padega!")
+            st.warning("Please enter a keyword.!")
         elif not PYTRENDS_OK:
             st.error("pytrends install karo: `pip install pytrends`")
         else:
-            with st.spinner("Google Trends se data aa raha hai…"):
+            with st.spinner("Fetching data from Google Trends…"):
                 try:
                     pytrends = TrendReq(hl='en-US', tz=330)
                     pytrends.build_payload([topic], geo=geo_map[geo], timeframe='today 12-m')
@@ -786,7 +786,7 @@ elif tool == "AI Blog Writer":
         if not topic:
             st.warning("Topic daalna padega!")
         else:
-            with st.spinner(f"Article likh raha hoon ({lang_label} mein)…"):
+            with st.spinner(f"Generating article ({lang_label} mein)…"):
                 time.sleep(1.2)
                 article = build_article(
                     topic, tone, include_faq, include_cta,
@@ -857,7 +857,7 @@ elif tool == "Keyword Difficulty Checker":
 
     if st.button("Check Difficulty", use_container_width=True):
         if not keyword:
-            st.warning("Keyword daalna padega!")
+            st.warning("Please enter a keyword.!")
         else:
             difficulty  = random.randint(20, 90)
             volume      = random.randint(500, 50000)
