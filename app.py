@@ -42,11 +42,13 @@ st.markdown("""
     .article-output ul { margin-left: 20px; margin-bottom: 12px; }
     .article-output li { margin-bottom: 6px; }
     .sidebar-icon-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.03); margin-bottom: 6px; font-size: 14px; color: #ccc; }
+    
+    /* SERP Preview Specific Styles */
     .preview-window { background: #202124; border-radius: 12px; padding: 30px 40px; border: 1px solid rgba(255,255,255,0.05); max-width: 650px; }
     .sp-favicon { width: 28px; height: 28px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 14px; font-weight: bold; margin-right: 12px; }
     .sp-url { color: #bdc1c6; font-size: 14px; font-family: Arial, sans-serif; }
     .sp-path { color: #70757a; }
-    .sp-title { color: #8ab4f8; font-size: 20px; font-weight: 400; margin-bottom: 6px; font-family: Arial, sans-serif; }
+    .sp-title { color: #8ab4f8; font-size: 20px; font-weight: 400; margin-bottom: 6px; font-family: Arial, sans-serif; cursor:pointer; }
     .sp-desc { color: #bdc1c6; font-size: 14px; line-height: 1.58; font-family: Arial, sans-serif; }
     .counter-good { color: #4caf50; font-weight: bold; }
     .counter-warn { color: #ff9800; font-weight: bold; }
@@ -63,14 +65,14 @@ with st.sidebar:
     st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
     
     page = st.selectbox("Navigate To", [
-        "📈 DA PA Checker", "👁️ SERP Preview", 
+        "👁️ SERP Preview", "📈 DA PA Checker", 
         "🔍 Keyword Research", "✍️ Article Writer"
     ], label_visibility="visible")
     
     st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
     st.markdown('''
+    <div class="sidebar-icon-row"><span class="icon">👁️</span> SERP Preview (Auto Fetch)</div>
     <div class="sidebar-icon-row"><span class="icon">📈</span> DA/PA Checker</div>
-    <div class="sidebar-icon-row"><span class="icon">👁️</span> SERP Preview</div>
     <div class="sidebar-icon-row"><span class="icon">🔍</span> Keyword Research</div>
     <div class="sidebar-icon-row"><span class="icon">✍️</span> Article Writer</div>
     ''', unsafe_allow_html=True)
@@ -92,6 +94,31 @@ def check_ssl(domain):
         with socket.create_connection((domain, 443), timeout=5) as sock:
             with context.wrap_socket(sock, server_hostname=domain): return True
     except: return False
+
+def fetch_meta_tags(url):
+    """Specifically fetches only Title and Meta Description"""
+    try:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+        r = requests.get(url, headers=headers, timeout=8)
+        if r.status_code != 200: return None, None, "HTTP Error"
+        
+        soup = BeautifulSoup(r.text, "html.parser")
+        
+        title = ""
+        if soup.title and soup.title.text: title = soup.title.text.strip()
+        
+        desc = ""
+        meta = soup.find("meta", attrs={"name": "description"})
+        if meta and meta.get("content"): desc = meta.get("content").strip()
+            
+        return title, desc, "Success"
+        
+    except requests.exceptions.Timeout:
+        return None, None, "Timeout"
+    except requests.exceptions.ConnectionError:
+        return None, None, "Connection Blocked"
+    except Exception as e:
+        return None, None, str(e)
 
 def analyze_page(url):
     result = {"status_code": None, "title": "", "meta_description": "", "h1_count": 0, "h2_count": 0, "word_count": 0, "internal_links": 0, "external_links": 0, "images": 0, "images_missing_alt": 0, "canonical": False, "https": url.startswith("https://"), "response_time": None}
@@ -118,10 +145,6 @@ def analyze_page(url):
         imgs = soup.find_all("img")
         result["images"] = len(imgs)
         result["images_missing_alt"] = sum(1 for img in imgs if not img.get("alt") or not img.get("alt").strip())
-    except requests.exceptions.Timeout:
-        result["error"] = "Timeout"
-    except requests.exceptions.ConnectionError:
-        result["error"] = "Connection Blocked"
     except Exception as e:
         result["error"] = str(e)
     return result
@@ -175,7 +198,6 @@ def score_label(score):
     elif score >= 20: return "Weak"
     return "Poor"
 
-# Keyword Helpers (Using JSON API which works on Cloud)
 def get_google_suggestions(keyword):
     try:
         r = requests.get(f"https://suggestqueries.google.com/complete/search?client=firefox&q={quote_plus(keyword)}", timeout=5)
@@ -183,7 +205,6 @@ def get_google_suggestions(keyword):
     except: return []
 
 def get_related_searches_bing(keyword):
-    """Fallback to Bing if Google blocks"""
     try:
         r = requests.get(f"https://www.bing.com/search?q={quote_plus(keyword)}", headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         if r.status_code == 200:
@@ -222,7 +243,7 @@ def generate_article_template(keyword, tone, length):
     num = {"Short": 3, "Medium": 5, "Long": 8}.get(length, 5)
     secs = ["Understanding", "Key Benefits", "How to Implement", "Common Mistakes", "Advanced Strategies", "Measuring Success", "Future Trends", "Conclusion"][:num]
     html = f'<h2>{ck}: Complete Guide</h2><p>Master {ck} with this comprehensive guide covering basics to advanced concepts.</p>'
-    for s in secs: html += f'<h3>{s} {ck}</h3><p>Understanding the core principles of {s.lower()} {ck.lower()} is essential. Experts recommend a structured approach.</p><ul><li>Focus on fundamentals</li><li>Apply practically</li></ul>'
+    for s in secs: html += f'<h3>{s} {ck}</h3><p>Understanding the core principles of {s.lower()} {ck.lower()} is essential.</p><ul><li>Focus on fundamentals</li><li>Apply practically</li></ul>'
     return html
 
 def count_words(t): return len(re.findall(r'\w+', re.sub(r'<[^>]+>', ' ', t)))
@@ -231,20 +252,103 @@ def count_words(t): return len(re.findall(r'\w+', re.sub(r'<[^>]+>', ' ', t)))
 # ROUTING
 # =========================
 page_config = {
-    "DA PA": {"title": "📈 DA PA Checker", "desc": "Estimated DA/PA. Works even if cloud blocks WHOIS (use manual age)."},
-    "SERP Preview": {"title": "👁️ SERP Preview Simulator", "desc": "See how your page will look on Google."},
+    "SERP Preview": {"title": "👁️ SERP Preview Simulator", "desc": "Paste URL to auto-fetch Title & Meta, or enter manually."},
+    "DA PA": {"title": "📈 DA PA Checker", "desc": "Estimated DA/PA. Works even if cloud blocks WHOIS."},
     "Keyword": {"title": "🔍 Keyword Research", "desc": "Keywords via Google Suggest API (Cloud Safe)."},
     "Article": {"title": "✍️ Article Writer", "desc": "Generate SEO articles (Free Template Mode)."}
 }
-p_type = next((k for k in page_config if k in page), "DA PA")
+p_type = next((k for k in page_config if k in page), "SERP Preview")
 cfg = page_config[p_type]
 st.markdown(f'<div class="main-title">{cfg["title"]}</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="sub-title">{cfg["desc"]}</div>', unsafe_allow_html=True)
 
+
 # =========================
-# PAGE 1: DA PA CHECKER (CLOUD SAFE)
+# PAGE 1: SERP PREVIEW (AUTO-FETCH ADDED)
 # =========================
-if p_type == "DA PA":
+if p_type == "SERP Preview":
+    with st.container():
+        st.markdown('<div class="box">', unsafe_allow_html=True)
+        
+        # Initialize session state for inputs if they don't exist
+        if "sp_url" not in st.session_state: st.session_state.sp_url = ""
+        if "sp_title" not in st.session_state: st.session_state.sp_title = ""
+        if "sp_desc" not in st.session_state: st.session_state.sp_desc = ""
+        
+        col_url, col_btn = st.columns([4, 1])
+        
+        with col_url:
+            p_url = st.text_input("Page URL", placeholder="https://www.example.com/page", key="sp_url")
+        with col_btn:
+            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True) # Padding to align button
+            fetch_btn = st.button("🔍 Fetch Data", use_container_width=True)
+        
+        p_title = st.text_input("SEO Title Tag", placeholder="My Awesome Title (50-60 Characters)", key="sp_title")
+        p_desc = st.text_area("Meta Description", placeholder="Summary of your page (150-160 Characters)...", key="sp_desc", height=80)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # FETCH LOGIC
+    if fetch_btn:
+        if not p_url.strip():
+            st.error("Please enter a URL first.")
+        else:
+            clean_url = normalize_url(p_url)
+            with st.spinner("Fetching Meta Tags from website..."):
+                title, desc, status = fetch_meta_tags(clean_url)
+                
+                if status == "Success":
+                    st.success("Data fetched successfully!")
+                    # Update session state to populate inputs
+                    st.session_state.sp_title = title if title else ""
+                    st.session_state.sp_desc = desc if desc else ""
+                    
+                    if not title and not desc:
+                        st.warning("Page loaded, but NO Title or Meta Description was found on this website.")
+                else:
+                    st.error(f"Failed to fetch: {status}. Cloud servers often block direct fetching. Please enter data manually below.")
+    
+    # PREVIEW LOGIC
+    t_len, d_len = len(p_title), len(p_desc)
+    def get_cc(l, mn, mx): return "counter-good" if mn <= l <= mx else "counter-warn" if (mn-10 <= l < mn) or (mx < l <= mx+10) else "counter-bad"
+    
+    display_title = p_title if t_len <= 60 else p_title[:57] + "..."
+    display_desc = p_desc if d_len <= 160 else p_desc[:157] + "..."
+    parsed_url = urlparse(p_url if p_url else "https://www.example.com")
+    domain_name = parsed_url.netloc.replace("www.", "") if parsed_url.netloc else "example.com"
+    
+    st.markdown("### Google Search Result Preview")
+    st.caption("This is exactly how users will see your link on Google.")
+    
+    st.markdown(f'''
+    <div class="preview-window">
+        <div style="display:flex;align-items:center;margin-bottom:6px;">
+            <div class="sp-favicon">{domain_name[0].upper() if domain_name else "E"}</div>
+            <div class="sp-url">{domain_name} <span class="sp-path">{parsed_url.path}</span></div>
+        </div>
+        <div class="sp-title">{display_title if p_title else "Your SEO Title Will Appear Here"}</div>
+        <div class="sp-desc">{display_desc if p_desc else "Your meta description will appear here. Make sure it includes your target keyword..."}</div>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.markdown("### 📊 SEO Character Limits Check")
+    
+    col_ch1, col_ch2 = st.columns(2)
+    with col_ch1: 
+        st.markdown(f'<div style="background:rgba(255,255,255,0.03);padding:15px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);"><div style="color:#ccc;font-size:14px;margin-bottom:5px;">Title Tag Length</div><div style="font-size:28px;font-weight:bold;" class="{get_cc(t_len, 50, 60)}">{t_len}</div><div style="color:#666;font-size:12px;margin-top:5px;">Recommended: 50 - 60</div></div>', unsafe_allow_html=True)
+    with col_ch2: 
+        st.markdown(f'<div style="background:rgba(255,255,255,0.03);padding:15px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);"><div style="color:#ccc;font-size:14px;margin-bottom:5px;">Meta Description Length</div><div style="font-size:28px;font-weight:bold;" class="{get_cc(d_len, 150, 160)}">{d_len}</div><div style="color:#666;font-size:12px;margin-top:5px;">Recommended: 150 - 160</div></div>', unsafe_allow_html=True)
+
+    if t_len > 60: st.warning("⚠️ Title too long! Google will cut it off.")
+    if d_len > 160: st.warning("⚠️ Description too long! It will be truncated.")
+    if 0 < t_len < 50: st.info("💡 Title is slightly short. You can add more keywords.")
+
+
+# =========================
+# PAGE 2: DA PA CHECKER
+# =========================
+elif p_type == "DA PA":
     with st.container():
         st.markdown('<div class="box">', unsafe_allow_html=True)
         url = st.text_input("Enter Website URL", placeholder="example.com")
@@ -258,24 +362,18 @@ if p_type == "DA PA":
         
         with st.spinner("Analyzing..."):
             page_data = analyze_page(url)
+            if "error" in page_data: st.warning(f"⚠️ Direct page fetch blocked by target site. Using available data.")
             
-            # Check if page fetch failed
-            if "error" in page_data:
-                st.warning(f"⚠️ Direct fetch failed ({page_data['error']}). This is common on Cloud servers due to IP blocking.")
-                st.info("💡 Using available data & Manual inputs for remaining analysis.")
-            
-            # Manual Domain Age Fallback (Crucial for Cloud)
             domain_age = None
             try:
                 w = whois.whois(domain)
                 cd = w.creation_date
                 if isinstance(cd, list): cd = cd[0]
                 if cd: domain_age = round((datetime.now() - cd).days / 365.25, 2)
-            except:
-                pass
+            except: pass
                 
             if not domain_age:
-                with st.expander("🔧 WHOIS Blocked by Server. Enter Domain Age Manually:", expanded=True):
+                with st.expander("🔧 WHOIS Blocked. Enter Domain Age Manually:", expanded=True):
                     man_age = st.number_input("Domain Age (in years)", min_value=0.0, max_value=30.0, value=1.0, step=0.5)
                     domain_age = man_age if man_age > 0 else None
             
@@ -306,35 +404,7 @@ if p_type == "DA PA":
             st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================
-# PAGE 2: SERP PREVIEW
-# =========================
-elif p_type == "SERP Preview":
-    with st.container():
-        st.markdown('<div class="box">', unsafe_allow_html=True)
-        p_url = st.text_input("Page URL", placeholder="https://www.example.com/page")
-        p_title = st.text_input("SEO Title Tag", placeholder="My Awesome Title (50-60 Characters)")
-        p_desc = st.text_area("Meta Description", placeholder="Summary of your page (150-160 Characters)...", height=80)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    t_len, d_len = len(p_title), len(p_desc)
-    def get_cc(l, mn, mx): return "counter-good" if mn <= l <= mx else "counter-warn" if (mn-10 <= l < mn) or (mx < l <= mx+10) else "counter-bad"
-    
-    display_title = p_title if t_len <= 60 else p_title[:57] + "..."
-    display_desc = p_desc if d_len <= 160 else p_desc[:157] + "..."
-    parsed_url = urlparse(p_url if p_url else "https://www.example.com")
-    domain_name = parsed_url.netloc.replace("www.", "") if parsed_url.netloc else "example.com"
-    
-    st.markdown(f'''<div class="preview-window"><div style="display:flex;align-items:center;margin-bottom:6px;"><div class="sp-favicon">{domain_name[0].upper()}</div><div class="sp-url">{domain_name} <span class="sp-path">{parsed_url.path}</span></div></div><div class="sp-title">{display_title if p_title else "Your Title Here"}</div><div class="sp-desc">{display_desc if p_desc else "Your meta description will appear here..."}</div></div>''', unsafe_allow_html=True)
-    
-    col_ch1, col_ch2 = st.columns(2)
-    with col_ch1: st.markdown(f'<div style="background:rgba(255,255,255,0.03);padding:15px;border-radius:10px;margin-top:15px;"><div style="color:#ccc;font-size:14px;">Title Length</div><div style="font-size:28px;font-weight:bold;" class="{get_cc(t_len, 50, 60)}">{t_len}</div><div style="color:#666;font-size:12px;">Ideal: 50-60</div></div>', unsafe_allow_html=True)
-    with col_ch2: st.markdown(f'<div style="background:rgba(255,255,255,0.03);padding:15px;border-radius:10px;margin-top:15px;"><div style="color:#ccc;font-size:14px;">Desc Length</div><div style="font-size:28px;font-weight:bold;" class="{get_cc(d_len, 150, 160)}">{d_len}</div><div style="color:#666;font-size:12px;">Ideal: 150-160</div></div>', unsafe_allow_html=True)
-    
-    if t_len > 60: st.warning("⚠️ Title too long! Google will cut it off.")
-    if d_len > 160: st.warning("⚠️ Description too long! It will be truncated.")
-
-# =========================
-# PAGE 3: KEYWORD RESEARCH (100% CLOUD SAFE)
+# PAGE 3: KEYWORD RESEARCH
 # =========================
 elif p_type == "Keyword":
     with st.container():
@@ -350,8 +420,6 @@ elif p_type == "Keyword":
             for s in get_google_suggestions(kw_input): all_kws.append({"kw": s, "src": "Auto", "diff": estimate_difficulty(s), "vol": estimate_volume(s)})
             for lt in get_long_tail_variations(kw_input):
                 if lt.lower() not in [k["kw"].lower() for k in all_kws]: all_kws.append({"kw": lt, "src": "Long-tail", "diff": estimate_difficulty(lt), "vol": estimate_volume(lt)})
-            
-            # Fetching Related via Bing to avoid Google Cloud Block
             with st.spinner("Fetching related from Bing..."):
                 for rel in get_related_searches_bing(kw_input):
                     if rel.lower() not in [k["kw"].lower() for k in all_kws]: all_kws.append({"kw": rel, "src": "Related", "diff": estimate_difficulty(rel), "vol": estimate_volume(rel)})
