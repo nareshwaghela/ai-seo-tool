@@ -50,24 +50,10 @@ st.markdown("""
     .sp-title { color: #8ab4f8; font-size: 20px; font-weight: 400; margin-bottom: 6px; font-family: Arial, sans-serif; cursor:pointer; }
     .sp-desc { color: #bdc1c6; font-size: 14px; line-height: 1.58; font-family: Arial, sans-serif; }
     
-    /* SEO Pixel Meter Styles */
-    .seo-meter-box {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 10px;
-        padding: 18px;
-        margin-bottom: 12px;
-    }
-    .seo-meter-label {
-        color: #ccc;
-        font-size: 15px;
-        margin-bottom: 6px;
-        font-weight: 500;
-    }
-    .seo-meter-value {
-        font-size: 16px;
-        font-weight: 700;
-    }
+    /* PRO SEO PIXEL METER */
+    .seo-meter-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 18px; }
+    .seo-meter-label { color: #ccc; font-size: 15px; margin-bottom: 6px; font-weight: 500; }
+    .seo-meter-value { font-size: 16px; font-weight: 700; }
     .seo-good { color: #4caf50; } /* Green */
     .seo-warn { color: #ffaa00; } /* Yellow/Orange */
     .seo-bad { color: #f44336; }  /* Red */
@@ -103,8 +89,7 @@ def normalize_url(url):
     if not url.startswith("http"): url = "https://" + url
     return url
 
-def get_domain(url):
-    return urlparse(url).netloc.replace("www.", "")
+def get_domain(url): return urlparse(url).netloc.replace("www.", "")
 
 def check_ssl(domain):
     try:
@@ -249,12 +234,11 @@ def generate_article_template(keyword, tone, length):
     ck = keyword.title().strip()
     num = {"Short": 3, "Medium": 5, "Long": 8}.get(length, 5)
     secs = ["Understanding", "Key Benefits", "How to Implement", "Common Mistakes", "Advanced Strategies", "Measuring Success", "Future Trends", "Conclusion"][:num]
-    html = f'<h2>{ck}: Complete Guide</h2><p>Master {ck} with this comprehensive guide covering basics to advanced concepts.</p>'
-    for s in secs: html += f'<h3>{s} {ck}</h3><p>Understanding the core principles of {s.lower()} {ck.lower()} is essential.</p><ul><li>Focus on fundamentals</li><li>Apply practically</li></ul>'
+    html = f'<h2>{ck}: Complete Guide</h2><p>Master {ck} with this comprehensive guide.</p>'
+    for s in secs: html += f'<h3>{s} {ck}</h3><p>Understanding the core principles is essential.</p><ul><li>Focus on fundamentals</li></ul>'
     return html
 
 def count_words(t): return len(re.findall(r'\w+', re.sub(r'<[^>]+>', ' ', t)))
-
 
 # =========================
 # ROUTING
@@ -272,9 +256,12 @@ st.markdown(f'<div class="sub-title">{cfg["desc"]}</div>', unsafe_allow_html=Tru
 
 
 # =========================
-# PAGE 1: SERP PREVIEW (PRO PIXEL UI)
+# PAGE 1: SERP PREVIEW (INSTANT COLOR FIX)
 # =========================
 if p_type == "SERP Preview":
+    
+    # Dummy callback to force instant rerun when user clicks outside/presses enter
+    def trigger_rerun(): pass
     
     if "fetch_msg" not in st.session_state:
         st.session_state.fetch_msg = ""
@@ -307,8 +294,9 @@ if p_type == "SERP Preview":
             st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
             st.button("🔍 Fetch", use_container_width=True, on_click=fetch_data_callback)
         
-        p_title = st.text_input("SEO Title Tag", placeholder="My Awesome Title (50-60 Characters)", key="sp_title")
-        p_desc = st.text_area("Meta Description", placeholder="Summary of your page (150-160 Characters)...", key="sp_desc", height=80)
+        # ADDED on_change=trigger_rerun HERE FOR INSTANT UPDATES
+        p_title = st.text_input("SEO Title Tag", placeholder="My Awesome Title (50-60 Characters)", key="sp_title", on_change=trigger_rerun)
+        p_desc = st.text_area("Meta Description", placeholder="Summary of your page (150-160 Characters)...", key="sp_desc", height=80, on_change=trigger_rerun)
         
         st.markdown('</div>', unsafe_allow_html=True)
     
@@ -319,25 +307,23 @@ if p_type == "SERP Preview":
         elif msg.startswith("warning:"): st.warning(msg.split(":", 1)[1])
         st.session_state.fetch_msg = ""
 
-    # PIXEL CALCULATION LOGIC (Google Desktop Standards)
+    # PIXEL MATH LOGIC
     t_len = len(p_title)
     d_len = len(p_desc)
     
-    # Google Desktop Max Width: Title ~600px, Desc ~960px. 
-    # Avg char width for Arial: Title (20px font) = ~10px, Desc (14px font) = ~7.5px
     t_px = int(t_len * 10) 
     d_px = int(d_len * 7.5) 
     
     def get_title_status(px):
-        if 500 <= px <= 600: return "seo-good" # Perfect range
-        elif (400 <= px < 500) or (600 < px <= 650): return "seo-warn" # Slightly short/long
-        elif px > 650: return "seo-bad" # Will truncate
-        else: return "seo-warn" # Too short
+        if 500 <= px <= 600: return "seo-good"   # 50-60 chars
+        elif (400 <= px < 500) or (600 < px <= 650): return "seo-warn" # 40-49 or 61-65 chars
+        elif px > 650: return "seo-bad"            # 65+ chars (Will truncate)
+        else: return "seo-warn"                    # Too short
         
     def get_desc_status(px):
-        if 1050 <= px <= 1200: return "seo-good" # Perfect range (140-160 chars)
-        elif (750 <= px < 1050) or (1200 < px <= 1275): return "seo-warn"
-        elif px > 1275: return "seo-bad" # Will truncate
+        if 1125 <= px <= 1200: return "seo-good"   # 150-160 chars
+        elif (750 <= px < 1125) or (1200 < px <= 1275): return "seo-warn" 
+        elif px > 1275: return "seo-bad"            # 170+ chars (Will truncate)
         else: return "seo-warn"
 
     t_class = get_title_status(t_px)
@@ -366,7 +352,7 @@ if p_type == "SERP Preview":
     # PIXEL METER UI
     st.markdown("---")
     st.markdown("### 📊 SEO Pixel Width Analysis")
-    st.caption("Based on standard Google Desktop font sizes (Arial).")
+    st.caption("Based on standard Google Desktop font sizes. Updates instantly when you click outside the box.")
     
     st.markdown(f'''
     <div style="display: flex; gap: 20px; flex-wrap: wrap;">
@@ -386,7 +372,7 @@ if p_type == "SERP Preview":
     </div>
     ''', unsafe_allow_html=True)
     
-    # Dynamic Warnings based on Pixels
+    # Dynamic Warnings
     if t_px > 650: st.error("⚠️ Title is too wide! Google will cut it off with '...'")
     elif 600 < t_px <= 650: st.warning("⚠️ Title is slightly too wide, risk of getting cut off.")
     elif t_px < 400 and t_len > 0: st.info("💡 Title is very short. You have space to add more keywords.")
@@ -397,7 +383,7 @@ if p_type == "SERP Preview":
 
 
 # =========================
-# PAGE 2: DA PA CHECKER
+# OTHER PAGES (DA PA, KW, ARTICLE)
 # =========================
 elif p_type == "DA PA":
     with st.container():
@@ -413,8 +399,7 @@ elif p_type == "DA PA":
         
         with st.spinner("Analyzing..."):
             page_data = analyze_page(url)
-            if "error" in page_data: st.warning(f"⚠️ Direct page fetch blocked by target site. Using available data.")
-            
+            if "error" in page_data: st.warning(f"⚠️ Direct page fetch blocked. Using available data.")
             domain_age = None
             try:
                 w = whois.whois(domain)
@@ -422,12 +407,10 @@ elif p_type == "DA PA":
                 if isinstance(cd, list): cd = cd[0]
                 if cd: domain_age = round((datetime.now() - cd).days / 365.25, 2)
             except: pass
-                
             if not domain_age:
                 with st.expander("🔧 WHOIS Blocked. Enter Domain Age Manually:", expanded=True):
-                    man_age = st.number_input("Domain Age (in years)", min_value=0.0, max_value=30.0, value=1.0, step=0.5)
+                    man_age = st.number_input("Domain Age (years)", min_value=0.0, max_value=30.0, value=1.0, step=0.5)
                     domain_age = man_age if man_age > 0 else None
-            
             ssl_ok = check_ssl(domain)
             da = calculate_da(domain_age, ssl_ok, page_data, domain)
             pa = calculate_pa(page_data)
@@ -454,9 +437,6 @@ elif p_type == "DA PA":
             st.write(f"**Time:** {page_data.get('response_time', 'N/A')}s")
             st.markdown('</div>', unsafe_allow_html=True)
 
-# =========================
-# PAGE 3: KEYWORD RESEARCH
-# =========================
 elif p_type == "Keyword":
     with st.container():
         st.markdown('<div class="box">', unsafe_allow_html=True)
@@ -467,13 +447,12 @@ elif p_type == "Keyword":
     if run_kw:
         if not kw_input.strip(): st.error("Keyword daalo."); st.stop()
         all_kws = []
-        with st.spinner("Fetching from Google Suggest API..."):
+        with st.spinner("Fetching from APIs..."):
             for s in get_google_suggestions(kw_input): all_kws.append({"kw": s, "src": "Auto", "diff": estimate_difficulty(s), "vol": estimate_volume(s)})
             for lt in get_long_tail_variations(kw_input):
                 if lt.lower() not in [k["kw"].lower() for k in all_kws]: all_kws.append({"kw": lt, "src": "Long-tail", "diff": estimate_difficulty(lt), "vol": estimate_volume(lt)})
-            with st.spinner("Fetching related from Bing..."):
-                for rel in get_related_searches_bing(kw_input):
-                    if rel.lower() not in [k["kw"].lower() for k in all_kws]: all_kws.append({"kw": rel, "src": "Related", "diff": estimate_difficulty(rel), "vol": estimate_volume(rel)})
+            for rel in get_related_searches_bing(kw_input):
+                if rel.lower() not in [k["kw"].lower() for k in all_kws]: all_kws.append({"kw": rel, "src": "Related", "diff": estimate_difficulty(rel), "vol": estimate_volume(rel)})
         
         if not all_kws: st.warning("No keywords found.")
         else:
@@ -481,9 +460,6 @@ elif p_type == "Keyword":
                 dt, dc = difficulty_label(k["diff"])
                 st.markdown(f'<div class="kw-box"><div><div class="kw-text">{k["kw"]}</div><div class="small">{k["src"]}</div></div><div style="display:flex;gap:10px;"><div class="small">~{k["vol"]:,}</div><div class="kw-badge" style="color:{dc};background:{dc}22;">{dt}</div></div></div>', unsafe_allow_html=True)
 
-# =========================
-# PAGE 4: ARTICLE WRITER
-# =========================
 elif p_type == "Article":
     with st.container():
         st.markdown('<div class="box">', unsafe_allow_html=True)
