@@ -3,3 +3,6 @@ openai
 fpdf
 pytrends
 pillow
+requests
+beautifulsoup4
+python-whois
