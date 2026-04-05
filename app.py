@@ -49,9 +49,28 @@ st.markdown("""
     .sp-path { color: #70757a; }
     .sp-title { color: #8ab4f8; font-size: 20px; font-weight: 400; margin-bottom: 6px; font-family: Arial, sans-serif; cursor:pointer; }
     .sp-desc { color: #bdc1c6; font-size: 14px; line-height: 1.58; font-family: Arial, sans-serif; }
-    .counter-good { color: #4caf50; font-weight: bold; }
-    .counter-warn { color: #ff9800; font-weight: bold; }
-    .counter-bad { color: #f44336; font-weight: bold; }
+    
+    /* SEO Pixel Meter Styles */
+    .seo-meter-box {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 12px;
+    }
+    .seo-meter-label {
+        color: #ccc;
+        font-size: 15px;
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+    .seo-meter-value {
+        font-size: 16px;
+        font-weight: 700;
+    }
+    .seo-good { color: #4caf50; } /* Green */
+    .seo-warn { color: #ffaa00; } /* Yellow/Orange */
+    .seo-bad { color: #f44336; }  /* Red */
 </style>
 """, unsafe_allow_html=True)
 
@@ -236,6 +255,7 @@ def generate_article_template(keyword, tone, length):
 
 def count_words(t): return len(re.findall(r'\w+', re.sub(r'<[^>]+>', ' ', t)))
 
+
 # =========================
 # ROUTING
 # =========================
@@ -250,12 +270,12 @@ cfg = page_config[p_type]
 st.markdown(f'<div class="main-title">{cfg["title"]}</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="sub-title">{cfg["desc"]}</div>', unsafe_allow_html=True)
 
+
 # =========================
-# PAGE 1: SERP PREVIEW (FIXED SESSION STATE)
+# PAGE 1: SERP PREVIEW (PRO PIXEL UI)
 # =========================
 if p_type == "SERP Preview":
     
-    # Initialize state for fetch messages
     if "fetch_msg" not in st.session_state:
         st.session_state.fetch_msg = ""
 
@@ -264,9 +284,7 @@ if p_type == "SERP Preview":
         if not url.strip():
             st.session_state.fetch_msg = "error:Please enter a URL first."
             return
-            
         clean_url = normalize_url(url)
-        # We can't use st.spinner inside a callback, so just fetch normally
         title, desc, status = fetch_meta_tags(clean_url)
         
         if status == "Success":
@@ -277,44 +295,62 @@ if p_type == "SERP Preview":
             else:
                 st.session_state.fetch_msg = "warning:Page loaded, but NO Title or Meta Description was found."
         else:
-            st.session_state.fetch_msg = f"error:Failed to fetch ({status}). Cloud servers often block direct fetching. Please enter data manually."
+            st.session_state.fetch_msg = f"error:Failed to fetch ({status}). Please enter manually."
 
     with st.container():
         st.markdown('<div class="box">', unsafe_allow_html=True)
         
         col_url, col_btn = st.columns([4, 1])
-        
         with col_url:
             p_url = st.text_input("Page URL", placeholder="https://www.example.com/page", key="sp_url")
         with col_btn:
             st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-            fetch_btn = st.button("🔍 Fetch", use_container_width=True, on_click=fetch_data_callback)
+            st.button("🔍 Fetch", use_container_width=True, on_click=fetch_data_callback)
         
         p_title = st.text_input("SEO Title Tag", placeholder="My Awesome Title (50-60 Characters)", key="sp_title")
         p_desc = st.text_area("Meta Description", placeholder="Summary of your page (150-160 Characters)...", key="sp_desc", height=80)
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # Show Fetch Status Message
     if st.session_state.fetch_msg:
         msg = st.session_state.fetch_msg
         if msg.startswith("success:"): st.success(msg.split(":", 1)[1])
         elif msg.startswith("error:"): st.error(msg.split(":", 1)[1])
         elif msg.startswith("warning:"): st.warning(msg.split(":", 1)[1])
-        # Clear message after showing
         st.session_state.fetch_msg = ""
 
-    # PREVIEW LOGIC
-    t_len, d_len = len(p_title), len(p_desc)
-    def get_cc(l, mn, mx): return "counter-good" if mn <= l <= mx else "counter-warn" if (mn-10 <= l < mn) or (mx < l <= mx+10) else "counter-bad"
+    # PIXEL CALCULATION LOGIC (Google Desktop Standards)
+    t_len = len(p_title)
+    d_len = len(p_desc)
     
+    # Google Desktop Max Width: Title ~600px, Desc ~960px. 
+    # Avg char width for Arial: Title (20px font) = ~10px, Desc (14px font) = ~7.5px
+    t_px = int(t_len * 10) 
+    d_px = int(d_len * 7.5) 
+    
+    def get_title_status(px):
+        if 500 <= px <= 600: return "seo-good" # Perfect range
+        elif (400 <= px < 500) or (600 < px <= 650): return "seo-warn" # Slightly short/long
+        elif px > 650: return "seo-bad" # Will truncate
+        else: return "seo-warn" # Too short
+        
+    def get_desc_status(px):
+        if 1050 <= px <= 1200: return "seo-good" # Perfect range (140-160 chars)
+        elif (750 <= px < 1050) or (1200 < px <= 1275): return "seo-warn"
+        elif px > 1275: return "seo-bad" # Will truncate
+        else: return "seo-warn"
+
+    t_class = get_title_status(t_px)
+    d_class = get_desc_status(d_px)
+    
+    # PREVIEW BOX
     display_title = p_title if t_len <= 60 else p_title[:57] + "..."
     display_desc = p_desc if d_len <= 160 else p_desc[:157] + "..."
     parsed_url = urlparse(p_url if p_url else "https://www.example.com")
     domain_name = parsed_url.netloc.replace("www.", "") if parsed_url.netloc else "example.com"
     
-    st.markdown("### Google Search Result Preview")
-    st.caption("This is exactly how users will see your link on Google.")
+    st.markdown("### Google Search Result Preview (Desktop)")
+    st.caption("This is exactly how users will see your link on Google Desktop.")
     
     st.markdown(f'''
     <div class="preview-window">
@@ -327,18 +363,38 @@ if p_type == "SERP Preview":
     </div>
     ''', unsafe_allow_html=True)
     
+    # PIXEL METER UI
     st.markdown("---")
-    st.markdown("### 📊 SEO Character Limits Check")
+    st.markdown("### 📊 SEO Pixel Width Analysis")
+    st.caption("Based on standard Google Desktop font sizes (Arial).")
     
-    col_ch1, col_ch2 = st.columns(2)
-    with col_ch1: 
-        st.markdown(f'<div style="background:rgba(255,255,255,0.03);padding:15px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);"><div style="color:#ccc;font-size:14px;margin-bottom:5px;">Title Tag Length</div><div style="font-size:28px;font-weight:bold;" class="{get_cc(t_len, 50, 60)}">{t_len}</div><div style="color:#666;font-size:12px;margin-top:5px;">Recommended: 50 - 60</div></div>', unsafe_allow_html=True)
-    with col_ch2: 
-        st.markdown(f'<div style="background:rgba(255,255,255,0.03);padding:15px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);"><div style="color:#ccc;font-size:14px;margin-bottom:5px;">Meta Description Length</div><div style="font-size:28px;font-weight:bold;" class="{get_cc(d_len, 150, 160)}">{d_len}</div><div style="color:#666;font-size:12px;margin-top:5px;">Recommended: 150 - 160</div></div>', unsafe_allow_html=True)
+    st.markdown(f'''
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div class="seo-meter-box" style="flex: 1; min-width: 280px;">
+            <div class="seo-meter-label">Title Tag</div>
+            <div class="seo-meter-value {t_class}">
+                {t_len} chars ({t_px}/600px)
+            </div>
+        </div>
+        
+        <div class="seo-meter-box" style="flex: 1; min-width: 280px;">
+            <div class="seo-meter-label">Meta Description</div>
+            <div class="seo-meter-value {d_class}">
+                {d_len} chars ({d_px}/960px)
+            </div>
+        </div>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    # Dynamic Warnings based on Pixels
+    if t_px > 650: st.error("⚠️ Title is too wide! Google will cut it off with '...'")
+    elif 600 < t_px <= 650: st.warning("⚠️ Title is slightly too wide, risk of getting cut off.")
+    elif t_px < 400 and t_len > 0: st.info("💡 Title is very short. You have space to add more keywords.")
+        
+    if d_px > 1275: st.error("⚠️ Description is too wide! Google will truncate it.")
+    elif 1200 < d_px <= 1275: st.warning("⚠️ Description is slightly too wide, might get truncated.")
+    elif d_px < 750 and d_len > 0: st.info("💡 Description is very short. Utilize the space to improve CTR.")
 
-    if t_len > 60: st.warning("⚠️ Title too long! Google will cut it off.")
-    if d_len > 160: st.warning("⚠️ Description too long! It will be truncated.")
-    if 0 < t_len < 50: st.info("💡 Title is slightly short. You can add more keywords.")
 
 # =========================
 # PAGE 2: DA PA CHECKER
