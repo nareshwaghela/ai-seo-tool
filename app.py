@@ -43,7 +43,6 @@ st.markdown("""
     .article-output li { margin-bottom: 6px; }
     .sidebar-icon-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.03); margin-bottom: 6px; font-size: 14px; color: #ccc; }
     
-    /* SERP Preview Specific Styles */
     .preview-window { background: #202124; border-radius: 12px; padding: 30px 40px; border: 1px solid rgba(255,255,255,0.05); max-width: 650px; }
     .sp-favicon { width: 28px; height: 28px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 14px; font-weight: bold; margin-right: 12px; }
     .sp-url { color: #bdc1c6; font-size: 14px; font-family: Arial, sans-serif; }
@@ -96,34 +95,24 @@ def check_ssl(domain):
     except: return False
 
 def fetch_meta_tags(url):
-    """Specifically fetches only Title and Meta Description"""
     try:
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
         r = requests.get(url, headers=headers, timeout=8)
         if r.status_code != 200: return None, None, "HTTP Error"
-        
         soup = BeautifulSoup(r.text, "html.parser")
-        
-        title = ""
-        if soup.title and soup.title.text: title = soup.title.text.strip()
-        
+        title = soup.title.text.strip() if soup.title and soup.title.text else ""
         desc = ""
         meta = soup.find("meta", attrs={"name": "description"})
         if meta and meta.get("content"): desc = meta.get("content").strip()
-            
         return title, desc, "Success"
-        
-    except requests.exceptions.Timeout:
-        return None, None, "Timeout"
-    except requests.exceptions.ConnectionError:
-        return None, None, "Connection Blocked"
-    except Exception as e:
-        return None, None, str(e)
+    except requests.exceptions.Timeout: return None, None, "Timeout"
+    except requests.exceptions.ConnectionError: return None, None, "Connection Blocked"
+    except Exception as e: return None, None, str(e)
 
 def analyze_page(url):
     result = {"status_code": None, "title": "", "meta_description": "", "h1_count": 0, "h2_count": 0, "word_count": 0, "internal_links": 0, "external_links": 0, "images": 0, "images_missing_alt": 0, "canonical": False, "https": url.startswith("https://"), "response_time": None}
     try:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5"}
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
         start = datetime.now()
         r = requests.get(url, headers=headers, timeout=10)
         result["response_time"] = round((datetime.now() - start).total_seconds(), 2)
@@ -145,8 +134,7 @@ def analyze_page(url):
         imgs = soup.find_all("img")
         result["images"] = len(imgs)
         result["images_missing_alt"] = sum(1 for img in imgs if not img.get("alt") or not img.get("alt").strip())
-    except Exception as e:
-        result["error"] = str(e)
+    except Exception as e: result["error"] = str(e)
     return result
 
 def calculate_da(domain_age, ssl_ok, page_data, domain):
@@ -262,52 +250,60 @@ cfg = page_config[p_type]
 st.markdown(f'<div class="main-title">{cfg["title"]}</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="sub-title">{cfg["desc"]}</div>', unsafe_allow_html=True)
 
-
 # =========================
-# PAGE 1: SERP PREVIEW (AUTO-FETCH ADDED)
+# PAGE 1: SERP PREVIEW (FIXED SESSION STATE)
 # =========================
 if p_type == "SERP Preview":
+    
+    # Initialize state for fetch messages
+    if "fetch_msg" not in st.session_state:
+        st.session_state.fetch_msg = ""
+
+    def fetch_data_callback():
+        url = st.session_state.get("sp_url", "")
+        if not url.strip():
+            st.session_state.fetch_msg = "error:Please enter a URL first."
+            return
+            
+        clean_url = normalize_url(url)
+        # We can't use st.spinner inside a callback, so just fetch normally
+        title, desc, status = fetch_meta_tags(clean_url)
+        
+        if status == "Success":
+            if title or desc:
+                st.session_state.sp_title = title
+                st.session_state.sp_desc = desc
+                st.session_state.fetch_msg = "success:Data fetched successfully!"
+            else:
+                st.session_state.fetch_msg = "warning:Page loaded, but NO Title or Meta Description was found."
+        else:
+            st.session_state.fetch_msg = f"error:Failed to fetch ({status}). Cloud servers often block direct fetching. Please enter data manually."
+
     with st.container():
         st.markdown('<div class="box">', unsafe_allow_html=True)
-        
-        # Initialize session state for inputs if they don't exist
-        if "sp_url" not in st.session_state: st.session_state.sp_url = ""
-        if "sp_title" not in st.session_state: st.session_state.sp_title = ""
-        if "sp_desc" not in st.session_state: st.session_state.sp_desc = ""
         
         col_url, col_btn = st.columns([4, 1])
         
         with col_url:
             p_url = st.text_input("Page URL", placeholder="https://www.example.com/page", key="sp_url")
         with col_btn:
-            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True) # Padding to align button
-            fetch_btn = st.button("🔍 Fetch Data", use_container_width=True)
+            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+            fetch_btn = st.button("🔍 Fetch", use_container_width=True, on_click=fetch_data_callback)
         
         p_title = st.text_input("SEO Title Tag", placeholder="My Awesome Title (50-60 Characters)", key="sp_title")
         p_desc = st.text_area("Meta Description", placeholder="Summary of your page (150-160 Characters)...", key="sp_desc", height=80)
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # FETCH LOGIC
-    if fetch_btn:
-        if not p_url.strip():
-            st.error("Please enter a URL first.")
-        else:
-            clean_url = normalize_url(p_url)
-            with st.spinner("Fetching Meta Tags from website..."):
-                title, desc, status = fetch_meta_tags(clean_url)
-                
-                if status == "Success":
-                    st.success("Data fetched successfully!")
-                    # Update session state to populate inputs
-                    st.session_state.sp_title = title if title else ""
-                    st.session_state.sp_desc = desc if desc else ""
-                    
-                    if not title and not desc:
-                        st.warning("Page loaded, but NO Title or Meta Description was found on this website.")
-                else:
-                    st.error(f"Failed to fetch: {status}. Cloud servers often block direct fetching. Please enter data manually below.")
-    
+    # Show Fetch Status Message
+    if st.session_state.fetch_msg:
+        msg = st.session_state.fetch_msg
+        if msg.startswith("success:"): st.success(msg.split(":", 1)[1])
+        elif msg.startswith("error:"): st.error(msg.split(":", 1)[1])
+        elif msg.startswith("warning:"): st.warning(msg.split(":", 1)[1])
+        # Clear message after showing
+        st.session_state.fetch_msg = ""
+
     # PREVIEW LOGIC
     t_len, d_len = len(p_title), len(p_desc)
     def get_cc(l, mn, mx): return "counter-good" if mn <= l <= mx else "counter-warn" if (mn-10 <= l < mn) or (mx < l <= mx+10) else "counter-bad"
@@ -343,7 +339,6 @@ if p_type == "SERP Preview":
     if t_len > 60: st.warning("⚠️ Title too long! Google will cut it off.")
     if d_len > 160: st.warning("⚠️ Description too long! It will be truncated.")
     if 0 < t_len < 50: st.info("💡 Title is slightly short. You can add more keywords.")
-
 
 # =========================
 # PAGE 2: DA PA CHECKER
