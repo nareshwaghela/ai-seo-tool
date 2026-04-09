@@ -1,366 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindMirror AI - Streamlit Setup Guide</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 100%);
-            color: #ffffff;
-            line-height: 1.7;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            padding: 60px 20px;
-            background: rgba(102, 126, 234, 0.08);
-            border-radius: 30px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #667eea, #f093fb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 20px;
-        }
-
-        .subtitle {
-            font-size: 1.3rem;
-            color: #b8b8d1;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .section {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 24px;
-            padding: 40px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #667eea;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .code-block {
-            background: #0d1117;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
-            padding: 25px;
-            overflow-x: auto;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .code-block pre {
-            margin: 0;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #c9d1d9;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            background: #764ba2;
-            transform: scale(1.05);
-        }
-
-        .step-list {
-            list-style: none;
-            counter-reset: step-counter;
-        }
-
-        .step-list li {
-            counter-increment: step-counter;
-            position: relative;
-            padding-left: 70px;
-            margin-bottom: 30px;
-            font-size: 1.05rem;
-        }
-
-        .step-list li::before {
-            content: counter(step-counter);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 1.3rem;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .feature-card {
-            background: rgba(102, 126, 234, 0.08);
-            padding: 25px;
-            border-radius: 16px;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            background: rgba(102, 126, 234, 0.12);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-        }
-
-        .feature-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .feature-desc {
-            color: #b8b8d1;
-            font-size: 0.95rem;
-        }
-
-        .highlight-box {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
-            border-left: 4px solid #667eea;
-            padding: 20px 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        .warning-box {
-            background: rgba(255, 107, 107, 0.1);
-            border-left: 4px solid #ff6b6b;
-            padding: 20px 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        .success-box {
-            background: rgba(67, 233, 123, 0.1);
-            border-left: 4px solid #43e97b;
-            padding: 20px 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        code {
-            background: rgba(102, 126, 234, 0.2);
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            color: #f093fb;
-        }
-
-        .btn-primary {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px 35px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin: 10px 5px;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.45);
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: #8b8bab;
-            margin-top: 60px;
-        }
-
-        @media (max-width: 768px) {
-            h1 { font-size: 2.2rem; }
-            .section-title { font-size: 1.5rem; }
-            .section { padding: 25px; }
-            .step-list li { padding-left: 60px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        
-        <!-- Header -->
-        <header>
-            <h1>🧠 MindMirror AI - Streamlit Version</h1>
-            <p class="subtitle">
-                Complete Python-based mental health app ready for deployment on Streamlit Cloud!
-                Real backend • Database integration • Production-ready 🚀
-            </p>
-        </header>
-
-        <!-- Overview Section -->
-        <div class="section">
-            <h2 class="section-title">✨ What You're Getting</h2>
-            
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🐍</div>
-                    <div class="feature-title">Pure Python</div>
-                    <div class="feature-desc">Complete Streamlit app in Python - no HTML/CSS/JS needed</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">💾</div>
-                    <div class="feature-title">Real Database</div>
-                    <div class="feature-desc">SQLite database for mood entries, chat history & user data</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <div class="feature-title">AI Integration Ready</div>
-                    <div class="feature-desc">Pre-built structure for OpenAI/Gemini API connection</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">☁️</div>
-                    <div class="feature-title">Cloud Deployable</div>
-                    <div class="feature-desc">One-click deploy to streamlit.app - free hosting!</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <div class="feature-title">Real Analytics</div>
-                    <div class="feature-desc">Plotly charts, pandas dataframes, actual statistics</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <div class="feature-title">Session Management</div>
-                    <div class="feature-desc">User sessions, authentication ready, secure data handling</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Installation Steps -->
-        <div class="section">
-            <h2 class="section-title">📦 Installation & Setup Guide</h2>
-            
-            <ol class="step-list">
-                <li>
-                    <strong>Install Python (if not already)</strong><br>
-                    Download from <code>python.org</code> or use Anaconda. Version 3.9+ recommended.
-                </li>
-
-                <li>
-                    <strong>Create Virtual Environment</strong><br>
-                    Open terminal/command prompt and run:
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <pre>python -m venv mindmirror_env
-
-# Activate environment:
-# Windows:
-mindmirror_env\Scripts\activate
-
-# Mac/Linux:
-source mindmirror_env/bin/activate</pre>
-                    </div>
-                </li>
-
-                <li>
-                    <strong>Install Required Packages</strong><br>
-                    Run this command to install all dependencies:
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <pre>pip install streamlit pandas plotly numpy sqlite3-utils</pre>
-                    </div>
-                </li>
-
-                <li>
-                    <strong>Download the App File</strong><br>
-                    Save the complete Python code as <code>mindmirror_app.py</code> in your project folder.
-                </li>
-
-                <li>
-                    <strong>Run the Application Locally</strong><br>
-                    Navigate to your project folder and run:
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <pre>streamlit run mindmirror_app.py</pre>
-                    </div>
-                    
-                    <div class="success-box">
-                        ✅ <strong>Success!</strong> Your browser will automatically open at <code>http://localhost:8501</code>
-                    </div>
-                </li>
-
-                <li>
-                    <strong>Deploy to Streamlit Cloud (Optional)</strong><br>
-                    Push code to GitHub, then connect to streamlit.cloud for free hosting!
-                </li>
-            </ol>
-        </div>
-
-        <!-- Main App Code -->
-        <div class="section">
-            <h2 class="section-title">🎯 Complete Streamlit Application Code</h2>
-            
-            <div class="highlight-box">
-                <strong>📝 Instructions:</strong> Copy the entire code block below and save it as <code>mindmirror_app.py</code>. 
-                This is the COMPLETE production-ready application!
-            </div>
-
-            <div class="code-block" style="max-height: 600px; overflow-y: auto;">
-                <button class="copy-btn" onclick="copyFullCode()">Copy Full Code</button>
-                <pre id="fullAppCode"># ============================================
+# ============================================
 # MINDMIRROR AI - STREAMLIT APPLICATION
 # Complete Mental Health Companion App
 # Author: Your Name
@@ -392,8 +30,8 @@ st.set_page_config(
 
 # Custom CSS for beautiful styling
 st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    @import url('https://artifacts-cdn.chatglm.site/https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     
     * {
         font-family: 'Inter', sans-serif;
@@ -486,7 +124,7 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-</style>
+
 """, unsafe_allow_html=True)
 
 # ============================================
@@ -631,10 +269,10 @@ def detect_emotion_simulation():
 
 # Hero Section
 st.markdown("""
-<div class="main-header">
-    <h1>🧠 MindMirror AI</h1>
-    <p>Your AI-Powered Emotional Wellness Companion</p>
-</div>
+
+    🧠 MindMirror AI
+    Your AI-Powered Emotional Wellness Companion
+
 """, unsafe_allow_html=True)
 
 # Create columns for main dashboard
@@ -646,15 +284,15 @@ col1, col2 = st.columns(2)
 
 with col1:
     # Emotion Detection Card
-    st.markdown('<div class="card-container">', unsafe_allow_html=True)
+    st.markdown('', unsafe_allow_html=True)
     st.subheader("📸 Real-Time Emotion Detection")
     
     if not st.session_state.scan_completed:
         st.markdown("""
-        <div style='text-align: center; padding: 2rem;'>
-            <div style='font-size: 5rem; margin-bottom: 1rem;'>📷</div>
-            <p style='color: #b8b8d1;'>Tap below to analyze your facial expression</p>
-        </div>
+        
+            📷
+            Tap below to analyze your facial expression
+        
         """, unsafe_allow_html=True)
         
         if st.button("🔍 Start Emotion Scan", key="scan_btn", use_container_width=True):
@@ -671,18 +309,18 @@ with col1:
         emotion = st.session_state.current_emotion
         
         st.markdown(f"""
-        <div style='text-align: center; padding: 1.5rem;'>
-            <div style='font-size: 6rem; margin-bottom: 1rem;'>{emotion['emoji']}</div>
-            <h2 style='background: linear-gradient(135deg, #667eea, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+        
+            {emotion['emoji']}
+            
                 {emotion['name']}
-            </h2>
-            <p style='color: #b8b8d1; font-size: 1.1rem;'>
-                Confidence Level: <strong>{emotion['confidence']}%</strong>
-            </p>
-            <div style='width: 100%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 6px; margin: 1rem 0;'>
-                <div style='width: {emotion['confidence']}%; height: 100%; background: linear-gradient(90deg, #667eea, #f093fb); border-radius: 6px;'></div>
-            </div>
-        </div>
+            
+            
+                Confidence Level: {emotion['confidence']}%
+            
+            
+                
+            
+        
         """, unsafe_allow_html=True)
         
         if st.button("🔄 Scan Again", key="reset_scan_btn", use_container_width=True):
@@ -690,12 +328,12 @@ with col1:
             st.session_state.current_emotion = None
             st.rerun()
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('', unsafe_allow_html=True)
     
     st.markdown("---")
     
     # Mood Tracker Card
-    st.markdown('<div class="card-container">', unsafe_allow_html=True)
+    st.markdown('', unsafe_allow_html=True)
     st.subheader("💭 How Are You Feeling?")
     
     # Mood selection grid
@@ -729,7 +367,7 @@ with col1:
         else:
             st.warning("⚠️ Please select a mood first!")
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('', unsafe_allow_html=True)
 
 # ============================================
 # COLUMN 2: AI CHAT + ANALYTICS
@@ -737,7 +375,7 @@ with col1:
 
 with col2:
     # AI Chat Interface
-    st.markdown('<div class="card-container">', unsafe_allow_html=True)
+    st.markdown('', unsafe_allow_html=True)
     st.subheader("🤖 AI Wellness Companion")
     
     # Display chat messages
@@ -746,9 +384,9 @@ with col2:
     with chat_container:
         for msg in st.session_state.chat_messages:
             if msg["role"] == "user":
-                st.markdown(f"<div class='chat-message-user'>😊 {msg['content']}</div>", unsafe_allow_html=True)
+                st.markdown(f"😊 {msg['content']}", unsafe_allow_html=True)
             else:
-                st.markdown(f"<div class='chat-message-ai'>🤖 {msg['content']}</div>", unsafe_allow_html=True)
+                st.markdown(f"🤖 {msg['content']}", unsafe_allow_html=True)
     
     # Chat input
     user_input = st.text_input(
@@ -780,12 +418,12 @@ with col2:
                 
                 st.rerun()
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('', unsafe_allow_html=True)
     
     st.markdown("---")
     
     # Analytics Dashboard
-    st.markdown('<div class="card-container">', unsafe_allow_html=True)
+    st.markdown('', unsafe_allow_html=True)
     st.subheader("📊 Your Wellness Statistics")
     
     # Get mood history
@@ -845,7 +483,7 @@ with col2:
     else:
         st.info("📝 No mood entries yet. Start by logging your first mood above!")
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('', unsafe_allow_html=True)
 
 # ============================================
 # BOTTOM SECTION: RECOMMENDATIONS
@@ -860,29 +498,27 @@ rec_col1, rec_col2 = st.columns(2)
 with rec_col1:
     with st.container():
         st.markdown("""
-        <div style='padding: 1.5rem; background: linear-gradient(135deg, rgba(168, 237, 234, 0.1), rgba(254, 214, 227, 0.1)); 
-                    border-radius: 16px; border: 1px solid rgba(168, 237, 234, 0.2);'>
-            <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🧘</div>
-            <div style='font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;'>Morning Mindfulness Meditation</div>
-            <div style='color: #b8b8d1; font-size: 0.9rem; margin-bottom: 0.5rem;'>
+        
+            🧘
+            Morning Mindfulness Meditation
+            
                 Start your day with clarity. This 10-minute guided session helps reduce anxiety.
-            </div>
-            <div style='color: #667eea; font-weight: 600; font-size: 0.85rem;'>⏱️ 10 mins • Beginner Friendly</div>
-        </div>
+            
+            ⏱️ 10 mins • Beginner Friendly
+        
         """, unsafe_allow_html=True)
 
 with rec_col2:
     with st.container():
         st.markdown("""
-        <div style='padding: 1.5rem; background: linear-gradient(135deg, rgba(240, 147, 251, 0.1), rgba(245, 87, 108, 0.1)); 
-                    border-radius: 16px; border: 1px solid rgba(240, 147, 251, 0.2);'>
-            <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🌬️</div>
-            <div style='font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;'>4-7-8 Breathing Exercise</div>
-            <div style='color: #b8b8d1; font-size: 0.9rem; margin-bottom: 0.5rem;'>
+        
+            🌬️
+            4-7-8 Breathing Exercise
+            
                 Instant stress relief technique. Calms your nervous system in just 2 minutes.
-            </div>
-            <div style='color: #f093fb; font-weight: 600; font-size: 0.85rem;'>⏱️ 2 mins • Quick Relief</div>
-        </div>
+            
+            ⏱️ 2 mins • Quick Relief
+        
         """, unsafe_allow_html=True)
 
 rec_col3, rec_col4 = st.columns(2)
@@ -890,29 +526,27 @@ rec_col3, rec_col4 = st.columns(2)
 with rec_col3:
     with st.container():
         st.markdown("""
-        <div style='padding: 1.5rem; background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1)); 
-                    border-radius: 16px; border: 1px solid rgba(79, 172, 254, 0.2);'>
-            <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>📝</div>
-            <div style='font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;'>Gratitude Journaling Prompt</div>
-            <div style='color: #b8b8d1; font-size: 0.9rem; margin-bottom: 0.5rem;'>
+        
+            📝
+            Gratitude Journaling Prompt
+            
                 Research shows gratitude practice increases happiness by 25%.
-            </div>
-            <div style='color: #4facfe; font-weight: 600; font-size: 0.85rem;'>⏱️ 5 mins • Mood Booster</div>
-        </div>
+            
+            ⏱️ 5 mins • Mood Booster
+        
         """, unsafe_allow_html=True)
 
 with rec_col4:
     with st.container():
         st.markdown("""
-        <div style='padding: 1.5rem; background: linear-gradient(135deg, rgba(67, 233, 123, 0.1), rgba(56, 249, 215, 0.1)); 
-                    border-radius: 16px; border: 1px solid rgba(67, 233, 123, 0.2);'>
-            <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🎵</div>
-            <div style='font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;'>Calming Ambient Playlist</div>
-            <div style='color: #b8b8d1; font-size: 0.9rem; margin-bottom: 0.5rem;'>
+        
+            🎵
+            Calming Ambient Playlist
+            
                 Curated nature sounds and soft melodies to help you relax deeply.
-            </div>
-            <div style='color: #43e97b; font-weight: 600; font-size: 0.85rem;'>⏱️ 45 mins • Sleep Aid</div>
-        </div>
+            
+            ⏱️ 45 mins • Sleep Aid
+        
         """, unsafe_allow_html=True)
 
 # ============================================
@@ -922,11 +556,11 @@ with rec_col4:
 with st.sidebar:
     st.markdown("### 👤 User Profile")
     st.markdown("""
-    <div style='text-align: center; padding: 1.5rem;'>
-        <div style='font-size: 4rem; margin-bottom: 0.5rem;'>😊</div>
-        <div style='font-weight: 700; font-size: 1.2rem;'>Welcome Back!</div>
-        <div style='color: #b8b8d1; font-size: 0.9rem;'>Premium Member ✨</div>
-    </div>
+    
+        😊
+        Welcome Back!
+        Premium Member ✨
+    
     """, unsafe_allow_html=True)
     
     st.markdown("---")
@@ -975,197 +609,10 @@ with st.sidebar:
 st.markdown("---")
 
 st.markdown("""
-<div style='text-align: center; padding: 2rem; color: #8b8bab;'>
-    <p>© 2026 MindMirror AI | Made with 💜 for better mental health everywhere</p>
-    <p style='font-size: 0.85rem; margin-top: 0.5rem;'>
-        <strong>Disclaimer:</strong> Not a substitute for professional medical advice. If you're in crisis, please call emergency services immediately.
-    </p>
-</div>
-""", unsafe_allow_html=True)</pre>
-            </div>
-        </div>
 
-        <!-- Deployment Guide -->
-        <div class="section">
-            <h2 class="section-title">☁️ Deploy to Streamlit Cloud (Free Hosting)</h2>
-            
-            <div class="success-box">
-                <strong>🎉 FREE HOSTING:</strong> Streamlit Cloud provides free deployment for public apps with up to 750 hours of runtime per month!
-            </div>
+    © 2026 MindMirror AI | Made with 💜 for better mental health everywhere
+    
+        Disclaimer: Not a substitute for professional medical advice. If you're in crisis, please call emergency services immediately.
+    
 
-            <ol class="step-list">
-                <li>
-                    <strong>Push Code to GitHub</strong><br>
-                    Create a new repository and upload <code>mindmirror_app.py</code>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <pre># In your terminal:
-git init
-git add mindmirror_app.py
-git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/mindmirror-ai.git
-git push -u origin main</pre>
-                    </div>
-                </li>
-
-                <li>
-                    <strong>Create Streamlit Cloud Account</strong><br>
-                    Go to <code>share.streamlit.io</code> and sign up with GitHub
-                </li>
-
-                <li>
-                    <strong>Connect Repository</strong><br>
-                    Click "New app" → Select your GitHub repo → Choose branch (main)<br>
-                    Set main file path: <code>mindmirror_app.py</code>
-                </li>
-
-                <li>
-                    <strong>Deploy! 🚀</strong><br>
-                    Click "Deploy" and wait 2-3 minutes. Your app will be live at:<br>
-                    <code>https://your-app-name.streamlit.app</code>
-                </li>
-            </ol>
-
-            <div class="highlight-box">
-                <strong>💡 Pro Tip:</strong> For persistent database in cloud deployment, consider using:
-                <ul style="margin-top: 10px; margin-left: 20px;">
-                    <li><code>Streamlit Community Cloud</code> with file persistence (free tier)</li>
-                    <li><code>Supabase</code> or <code>Firestore</code> for cloud databases</li>
-                    <li><code>Google Sheets API</code> for simple data storage</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Features Comparison -->
-        <div class="section">
-            <h2 class="section-title">🆚 HTML vs Streamlit Version Comparison</h2>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                <thead>
-                    <tr style="background: rgba(102, 126, 234, 0.2);">
-                        <th style="padding: 15px; text-align: left; border: 1px solid rgba(255,255,255,0.1);">Feature</th>
-                        <th style="padding: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">HTML Prototype</th>
-                        <th style="padding: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">Streamlit Version</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="padding: 12px; border: 1px solid rgba(255,255,255,0.05);"><strong>Database Storage</strong></td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">❌ No (session only)</td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">✅ SQLite (persistent)</td>
-                    </tr>
-                    <tr style="background: rgba(255,255,255,0.02);">
-                        <td style="padding: 12px; border: 1px solid rgba(255,255,255,0.05);"><strong>Data Persistence</strong></td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">❌ Lost on refresh</td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">✅ Saves forever</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 12px; border: 1px solid rgba(255,255,255,0.05);"><strong>Real Charts</strong></td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">⚠️ CSS only (static)</td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">✅ Plotly (interactive)</td>
-                    </tr>
-                    <tr style="background: rgba(255,255,255,0.02);">
-                        <td style="padding: 12px; border: 1px solid rgba(255,255,255,0.05);"><strong>AI Integration</strong></td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">⚠️ Pre-programmed</td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">✅ API-ready (OpenAI/Gemini)</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 12px; border: 1px solid rgba(255,255,255,0.05);"><strong>User Authentication</strong></td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">❌ Not possible</td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">✅ Easy to add</td>
-                    </tr>
-                    <tr style="background: rgba(255,255,255,0.02);">
-                        <td style="padding: 12px; border: 1px solid rgba(255,255,255,0.05);"><strong>Deployment</strong></td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">⚠️ Static hosting only</td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">✅ Streamlit Cloud (free)</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 12px; border: 1px solid rgba(255,255,255,0.05);"><strong>Scalability</strong></td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">❌ Limited</td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">✅ Auto-scales</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Next Steps -->
-        <div class="section">
-            <h2 class="section-title">🚀 Next Steps After Deployment</h2>
-            
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🔗</div>
-                    <div class="feature-title">Add Real AI</div>
-                    <div class="feature-desc">Integrate OpenAI GPT-4 or Google Gemini API for genuine conversational AI responses</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📷</div>
-                    <div class="feature-title">Camera Integration</div>
-                    <div class="feature-desc">Use TensorFlow.js or MediaPipe for actual face/emotion detection via webcam</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">👤</div>
-                    <div class="feature-title">User Authentication</div>
-                    <div class="feature-desc">Add login/signup with Streamlit-Authenticator or Firebase Auth</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">💳</div>
-                    <div class="feature-title">Payment System</div>
-                    <div class="feature-desc">Integrate Stripe/Razorpay for Premium subscription payments</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📧</div>
-                    <div class="feature-title">Email Notifications</div>
-                    <div class="feature-desc">Daily mood check-ins, weekly reports, crisis alerts via email/SMS</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🌙</div>
-                    <div class="feature-title">Mobile App</div>
-                    <div class="feature-desc">Convert to React Native or Flutter for iOS/Android native apps</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer>
-            <p><strong>🧠 MindMirror AI</strong> - Built with ❤️ using Streamlit</p>
-            <p style="margin-top: 10px;">
-                Complete Python Application | Production-Ready | Free Deployment Available
-            </p>
-            <p style="margin-top: 15px; font-size: 0.9rem;">
-                © 2026 MindMirror AI. Empowering mental wellness through technology.
-            </p>
-        </footer>
-
-    </div>
-
-    <script>
-        function copyCode(button) {
-            const codeBlock = button.parentElement.querySelector('pre');
-            const textArea = document.createElement('textarea');
-            textArea.value = codeBlock.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            button.textContent = 'Copied! ✓';
-            setTimeout(() => {
-                button.textContent = 'Copy';
-            }, 2000);
-        }
-
-        function copyFullCode() {
-            const fullCode = document.getElementById('fullAppCode').textContent;
-            const textArea = document.createElement('textarea');
-            textArea.value = fullCode;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            alert('✅ Full application code copied to clipboard!\n\nNow paste it into mindmirror_app.py file');
-        }
-    </script>
-</body>
-</html>
+""", unsafe_allow_html=True)
